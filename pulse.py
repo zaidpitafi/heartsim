@@ -48,6 +48,13 @@ def sym4_gen(amp,step_size):
     phi, psi, x = wavelet.wavefun(level=10)
     return psi
 
+def rr_gen(in_sig, sample_rate, respiratory_rate):
+    num_points = 1 * sample_rate
+    seg_fre = respiratory_rate / (60/1)
+    seg_amp = max(in_sig)*0.10
+    rr_component = seg_amp*np.sin(2*np.pi * seg_fre * x_space)
+    scg += rr_component
+    return None
     
 
 # i2c = busio.I2C(board.SCL, board.SDA)
