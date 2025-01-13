@@ -136,7 +136,8 @@ def _ecg_simulate_daubechies(duration=10, length=None, sampling_rate=1000, heart
     num_heart_beats = int(duration * heart_rate / 60)
 
     # Concatenate together the number of heart beats needed
-    ecg = np.tile(cardiac, num_heart_beats)
+    # ecg = np.tile(cardiac, num_heart_beats)
+    ecg = cardiac
 
     # Change amplitude
     ecg = ecg * 10
@@ -217,7 +218,7 @@ def _ecg_simulate_ecgsyn(
     hrfact2 = np.sqrt(hrfact)
     bi = hrfact * bi
     ti = np.array([hrfact2, hrfact, 1, hrfact, hrfact2]) * ti
-
+    
     # Check that sfint is an integer multiple of sfecg
     q = np.round(sfint / sfecg)
     qd = sfint / sfecg

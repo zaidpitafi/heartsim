@@ -1,7 +1,6 @@
 import numpy as np
 import time
 from smbus2 import SMBus
-import adafruit_mcp4725 as a
 import math
 import board, busio
 

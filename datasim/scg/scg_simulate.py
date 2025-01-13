@@ -143,7 +143,8 @@ def _scg_simulate_daubechies(duration=10, length=None, sampling_rate=100, heart_
     cardiac = np.concatenate([cardiac_s, cardiac_d])
 
     # Caculate the number of beats in capture time period
-    num_heart_beats = int(duration * heart_rate / 60)
+    # num_heart_beats = int(heart_rate/duration)
+    num_heart_beats = 1 
 
     # Concatenate together the number of heart beats needed
     scg = np.tile(cardiac, num_heart_beats)
