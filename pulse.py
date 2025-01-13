@@ -50,11 +50,12 @@ def sym4_gen(amp,step_size):
 
 def rr_gen(in_sig, sample_rate, respiratory_rate):
     num_points = 1 * sample_rate
+    x_space = np.linspace(0,1,num_points)
     seg_fre = respiratory_rate / (60/1)
     seg_amp = max(in_sig)*0.10
     rr_component = seg_amp*np.sin(2*np.pi * seg_fre * x_space)
-    scg += rr_component
-    return None
+    in_sig += rr_component
+    return in_sig
     
 
 # i2c = busio.I2C(board.SCL, board.SDA)

@@ -24,6 +24,8 @@ def main(args):
 
     ibi = args.ibi_interval
 
+    rr = args.rr
+
     # i2c = busio.I2C(board.SCL, board.SDA)
     # dac = a.MCP4725(i2c, address=0x60)
 
@@ -37,6 +39,8 @@ def main(args):
         wave= mexhat_gen(amplitude,sample_rate)
     elif args.wave_type == 'sym4':
         wave= sym4_gen(amplitude,sample_rate)
+
+    wave = rr_gen(wave, sample_rate, rr)
 
     try:
         while(True):
