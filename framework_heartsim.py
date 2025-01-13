@@ -27,13 +27,23 @@ def main(args):
         wave= ecg_gen(amplitude,sample_rate)
     elif args.wave_type == 'scg':
         wave= scg_gen(amplitude,sample_rate)
+    elif args.wave_type == 'hat':
+        wave= mexhat_gen(amplitude,sample_rate)
+    elif args.wave_type == 'sym4':
+        wave= sym4_gen(amplitude,sample_rate)
 
     try:
         while(True):
+            start_time = time.time()
             for i in range(0,41):
                 print(wave[i])
                 # dac.raw_value = int(wave[i])
                 time.sleep(0.01)
+            end_time = time.time()
+            total_time = end_time - start_time
+            actual_delay = total_time / sample_rate
+            print(f"Calculated frequency: {1 / (actual_delay * sample_rate):.2f} Hz")
+
             time.sleep(0.01)  ##IBI
     except KeyboardInterrupt:
         print('End')

@@ -13,7 +13,8 @@ from datasim.scg.scg_simulate import *
 #from utils import write_influx
 # from mqtt_to_influxdb import *
 from mqtt import *
-
+from scipy import signal
+import pywt
 
 sample_rate = 41
 
@@ -35,6 +36,17 @@ def sine_gen(amp, step_size):
         val = amp + int(amp * (math.sin(2 * math.pi * i/4095)))
         sine_wave.append(val)    
     return sine_wave
+
+def mexhat_gen(amp, step_size):
+    points = step_size
+    a = 4 ##width
+    vec2 = signal.ricker(points, a)
+    return vec2
+
+def sym4_gen(amp,step_size):
+    wavelet = pywt.Wavelet('sym4')
+    phi, psi, x = wavelet.wavefun(level=10)
+    return psi
 
     
 
