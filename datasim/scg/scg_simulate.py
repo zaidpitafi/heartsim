@@ -160,9 +160,9 @@ def _scg_simulate_daubechies(duration=10, length=None, sampling_rate=100, heart_
 
 
     ### add rr
-    num_points = duration * sampling_rate
+    num_points = 1 * sampling_rate
     x_space = np.linspace(0,1,num_points)
-    seg_fre = respiratory_rate / (60/duration)
+    seg_fre = respiratory_rate / (60/1)
     seg_amp = max(scg)*0.10
     rr_component = seg_amp*np.sin(2*np.pi * seg_fre * x_space)
     scg += rr_component
