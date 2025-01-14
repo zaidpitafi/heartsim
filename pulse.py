@@ -43,8 +43,9 @@ def sine_gen (amp, samples):
     sine_wave = amplitude + (amplitude * np.sin(2 * np.pi * frequency * t))  
     return sine_wave
 
-def sine_gen_old(amp, step_size):
+def sine_gen_old(amp, samples):
     sine_wave=[]
+    step_size = int(4095/samples)
     for i in range(0,4095,step_size):
         val = amp + int(amp * (math.sin(2 * math.pi * i/4095)))
         sine_wave.append(val)    
@@ -69,6 +70,7 @@ def rr_gen(in_sig, sample_rate, respiratory_rate):
     seg_amp = max(in_sig)*0.10
     rr_component = seg_amp*np.sin(2*np.pi * seg_fre * x_space)
     in_sig += rr_component
+
     return in_sig
 
 def random_hr_gen(min,max):

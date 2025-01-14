@@ -7,12 +7,14 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from datasim.ecg.ecg_simulate import *
-#from utils import write_influx
-# from mqtt_to_influxdb import *
+from utils import write_influx
+from mqtt_to_influxdb import *
 from mqtt import *
 from pulse import *
 import argparse
-from utils import *
+import busio
+import board
+import adafruit_mcp4725 as a
 
 influx = {'ip':'http://172.22.112.251', 'db':'shake',
                   'user':'algtest', 'passw':'sensorweb711', 
@@ -33,8 +35,8 @@ def main(args):
     unit = args.unit
     rr = args.rr
 
-    # i2c = busio.I2C(board.SCL, board.SDA)
-    # dac = a.MCP4725(i2c, address=0x60)
+    i2c = busio.I2C(board.SCL, board.SDA)
+    dac = a.MCP4725(i2c, address=0x60)
 
     if args.wave_type == 'sine':
         wave = sine_gen(amplitude,samples)
@@ -47,14 +49,14 @@ def main(args):
     elif args.wave_type == 'sym4':
         wave= sym4_gen(amplitude,samples)
 
-    wave = rr_gen(wave, samples, rr)
+    #wave = rr_gen(wave, samples, rr)
 
     try:
         while(True):
             start_time = time.time()
             for i in range(0,41):
-                # print(wave[i])
-                # dac.raw_value = int(wave[i])
+                print(int(wave[i]))
+                dac.raw_value = int(wave[i])
                 time.sleep(delay_req)
             end_time = time.time()
             total_time = end_time - start_time
