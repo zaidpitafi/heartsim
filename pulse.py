@@ -67,7 +67,7 @@ def sym4_gen(amp,step_size):
     psi = np.tile(psi,10)
     return psi
 
-def rr_gen(in_sig, sample_rate, respiratory_rate):
+def rr_gen(in_sig, respiratory_rate):
     print(len(in_sig))
     num_points = int(in_sig.shape[0])
     x_space = np.linspace(0,1,num_points)

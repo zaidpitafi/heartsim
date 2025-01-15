@@ -37,9 +37,8 @@ def sine_gen(amp, step_size):
     for i in range(0,4095,+step_size):
         val = amp + int(amp * (math.sin(2 * math.pi * i/4095)))
         time.sleep(0.01)
-        # print(val)
+        print(val)
         dac.raw_value = val
-        data_mqtt(val)
         sine_wave.append(val)
     
     return sine_wave

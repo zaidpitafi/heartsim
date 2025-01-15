@@ -49,19 +49,19 @@ def main(args):
     elif args.wave_type == 'sym4':
         wave= sym4_gen(amplitude,samples)
 
-    #wave = rr_gen(wave, samples, rr)
+    wave = rr_gen(wave, rr)
 
     try:
         while(True):
             start_time = time.time()
             for i in range(0,41):
-                print(int(wave[i]))
+                #print(int(wave[i]))
                 dac.raw_value = int(wave[i])
                 time.sleep(delay_req)
             end_time = time.time()
             total_time = end_time - start_time
             actual_delay = total_time/samples
-            print(f"Calculated frequency: {1 / (actual_delay * samples):.2f} Hz")
+            print(f"Calculated HR: {60* 1 / (actual_delay * samples):.2f} bpm")
             write_influx(influx= influx, unit=unit,table_name=table_name, data_name='value', data=wave, start_timestamp=start_time, fs = 1/delay_req)
             time.sleep(ibi)  ##IBI
     except KeyboardInterrupt:
@@ -79,7 +79,7 @@ if __name__== '__main__':
                         help='the sampling rate of DAC board, divisible by 4096')                                
     parser.add_argument('--amplitude', type=int, default='1024', 
                         help='the strength of signal')
-    parser.add_argument('--rr', type=int, default=10, help='rr duration')
+    parser.add_argument('--rr', type=int, default=20, help='rr duration')
     parser.add_argument('--ibi_interval', type=int, default=0, help='rr duration')
 
     args = parser.parse_args()
