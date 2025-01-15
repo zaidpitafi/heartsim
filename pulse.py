@@ -25,10 +25,12 @@ amplitude = 1024
 def scg_gen(amp, step_size):
     scg = scg_simulate(length=step_size, duration=1)
     scg_n = amp + int((scg-np.min(scg))/(np.max(scg)-np.min(scg)) * amp)
-    return scg
+    scg_n = np.tile(scg_n,10)
+    return scg_n
 def ecg_gen(amp, step_size):
     ecg = ecg_simulate(length=step_size, heart_rate = 80)
     ecg_n = amp + int((ecg-np.min(ecg))/(np.max(ecg)-np.min(ecg)) * amp)
+    ecg_n = np.tile(ecg_n,10)
     return ecg_n
 
 def sine_gen (amp, samples):
@@ -40,7 +42,8 @@ def sine_gen (amp, samples):
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
 
     # Generate the sine wave
-    sine_wave = amplitude + (amplitude * np.sin(2 * np.pi * frequency * t))  
+    sine_wave = amplitude + (amplitude * np.sin(2 * np.pi * frequency * t))
+    sine_wave = np.tile(sine_wave,10)  
     return sine_wave
 
 def sine_gen_old(amp, samples):
@@ -55,16 +58,18 @@ def mexhat_gen(amp, step_size):
     points = step_size
     a = 4 ##width
     vec2 = signal.ricker(points, a)
+    vec2 = np.tile(vec2,10)
     return vec2
 
 def sym4_gen(amp,step_size):
     wavelet = pywt.Wavelet('sym4')
     phi, psi, x = wavelet.wavefun(level=10)
+    psi = np.tile(psi,10)
     return psi
 
 def rr_gen(in_sig, sample_rate, respiratory_rate):
     print(len(in_sig))
-    num_points = 1 * sample_rate
+    num_points = int(in_sig.shape[0])
     x_space = np.linspace(0,1,num_points)
     seg_fre = respiratory_rate / (60/1)
     seg_amp = max(in_sig)*0.10
