@@ -28,7 +28,7 @@ def main(args):
     heart_rate = args.hr
     freq = heart_rate/60
     samples = 410  ## number of points from DAC 
-    delay_req = 1/(freq*sample_rate)
+    delay_req = 1/(freq*samples)
     amplitude = args.amplitude  ### Strength of the Signal
 
     ibi = args.ibi_interval
