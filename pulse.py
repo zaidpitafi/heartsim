@@ -15,12 +15,8 @@ from datasim.scg.scg_simulate import *
 from mqtt import *
 from scipy import signal
 import pywt
-
-sample_rate = 41
-
-step_size = int(4095/41)
-
-amplitude = 1024
+import datetime
+import pytz
 
 def scg_gen(amp, step_size):
     scg = scg_simulate(length=step_size, duration=1)
@@ -33,8 +29,8 @@ def ecg_gen(amp, step_size):
     ecg_n = np.tile(ecg_n,10)
     return ecg_n
 
-def sine_gen (amp, samples):
-    frequency = 1       # Frequency in Hz
+def sine_gen (amp, samples, hb, freq):
+    frequency = freq       # Frequency in Hz
     amplitude = amp       # Amplitude of the sine wave
     sampling_rate = samples # Sampling rate in Hz
     duration = 1        # Duration in seconds
@@ -43,7 +39,27 @@ def sine_gen (amp, samples):
 
     # Generate the sine wave
     sine_wave = amplitude + (amplitude * np.sin(2 * np.pi * frequency * t))
-    sine_wave = np.tile(sine_wave,10)  
+
+    sine_wave = np.tile(sine_wave,hb)  
+    return sine_wave
+
+def sine_gen_with_rr (amp, samples, duration, freq, rr):
+    freq_hr = freq       # Frequency in Hz
+    freq_rr = rr/60
+    hr_amp = amp       # Amplitude of the sine wave
+    rr_amp = 0.2*hr_amp
+    sampling_rate = samples # Sampling rate in Hz
+    duration = duration        # Duration in seconds
+    
+    # Generate the time axis
+    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
+
+
+    # Generate the sine wave
+    rr_wave = rr_amp + (rr_amp*np.sin(2 * np.pi * freq_rr * t))
+    hr_wave = hr_amp + (hr_amp * np.sin(2 * np.pi * freq_hr * t))
+    
+    sine_wave = rr_wave + hr_wave
     return sine_wave
 
 def sine_gen_old(amp, samples):
@@ -67,29 +83,47 @@ def sym4_gen(amp,step_size):
     psi = np.tile(psi,10)
     return psi
 
-def rr_gen(in_sig, respiratory_rate):
+def rr_gen_ming(in_sig, respiratory_rate):
     print(len(in_sig))
     num_points = int(in_sig.shape[0])
     x_space = np.linspace(0,1,num_points)
     seg_fre = respiratory_rate / (60/1)
-    seg_amp = max(in_sig)*0.10
+    seg_amp = max(in_sig)*0.1
     rr_component = seg_amp*np.sin(2*np.pi * seg_fre * x_space)
     in_sig += rr_component
 
     return in_sig
 
+def rr_gen(rr, samples):
+    fs = samples  # Sampling frequency in Hz
+    duration = 1  # Signal duration in seconds
+    f_resp = rr  # Respiration frequency in Hz (15 breaths per minute)
+
+    # Time vector
+    t = np.linspace(0, duration, int(fs * duration), endpoint=False)
+
+    # Respiration signal (sinusoidal)
+    amplitude = 1.0  # Amplitude of the signal
+    resp_signal = amplitude + (int(amplitude * np.sin(2 * np.pi * f_resp * t)))
+
+    return resp_signal
+
 def random_hr_gen(min,max):
     val = np.random(min,max)
     return val
+
+
+def epoch_to_datetime_est(epoch_time):
+    """Converts epoch time to datetime in EST."""
     
-
-# i2c = busio.I2C(board.SCL, board.SDA)
-# dac = a.MCP4725(i2c, address=0x60)
-
-# try:
-#     while(True):
-#         a = sine_gen(amp=amplitude, step_size=step_size)
-        
-
-# except KeyboardInterrupt:
-#     print('End')
+    # Convert epoch time to datetime (UTC)
+    dt_utc = datetime.datetime.utcfromtimestamp(epoch_time)
+    
+    # Define EST timezone
+    est_timezone = pytz.timezone('US/Eastern')
+    
+    # Localize the datetime to EST
+    dt_est = dt_utc.replace(tzinfo=pytz.utc).astimezone(est_timezone)
+    
+    return dt_est
+    
