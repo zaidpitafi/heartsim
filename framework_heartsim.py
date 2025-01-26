@@ -16,7 +16,7 @@ import busio
 import board
 import adafruit_mcp4725 as a
 
-influx = {'ip':'http://172.22.112.251', 'db':'shake',
+influx = {'ip':'http://sensorserver.engr.uga.edu', 'db':'shake',
                   'user':'algtest', 'passw':'sensorweb711', 
                   'ssl':False}
 
@@ -25,11 +25,14 @@ data_name = 'value'
 
 def main(args):
     
-    heart_rate = args.hr
-    freq = heart_rate/60
+    hr = args.hr
+    freq = hr/60
     samples = 410  ## number of points from DAC 
-    delay_req = 1/(freq*samples)
+    delay_req = 1/(samples)
     amplitude = args.amplitude  ### Strength of the Signal
+    duration = args.duration
+
+    hb = int(freq * duration)
 
     ibi = args.ibi_interval
     unit = args.unit
@@ -39,7 +42,7 @@ def main(args):
     dac = a.MCP4725(i2c, address=0x60)
 
     if args.wave_type == 'sine':
-        wave = sine_gen(amplitude,samples)
+        wave = sine_gen_with_rr(amplitude, samples, duration, freq, rr)
     elif args.wave_type == 'ecg':
         wave= ecg_gen(amplitude,samples)
     elif args.wave_type == 'scg':
@@ -49,23 +52,37 @@ def main(args):
     elif args.wave_type == 'sym4':
         wave= sym4_gen(amplitude,samples)
 
-    wave = rr_gen(wave, rr)
-
+    # wave = rr_gen_ming(wave, rr)
+    simulated_data = []
+    diff = 0
+    init_time = time.time()
+    init_time = epoch_to_datetime_est(init_time)
     try:
         while(True):
             start_time = time.time()
-            for i in range(0,samples):
-                #print(int(wave[i]))
+            print('Start time:', start_time)
+
+            for i in range(0,duration*samples-1):
                 dac.raw_value = int(wave[i])
-                time.sleep(delay_req)
+                delay = delay_req - 0.00041     # inherent delay of DAC is subtracted
+                time.sleep(delay)
             end_time = time.time()
-            total_time = end_time - start_time
-            actual_delay = total_time/samples
-            print(f"Calculated HR: {60* 1 / (actual_delay * samples):.2f} bpm")
-            write_influx(influx= influx, unit=unit,table_name=table_name, data_name='value', data=wave, start_timestamp=start_time, fs = 1/delay_req)
+            print('End time:', end_time)
+            total_time = (end_time - start_time)
+            diff = end_time - start_time
+            
+            calc_hr = freq* duration * 60 * 1/(total_time)
+            # print("Actual Diff", diff)
+            print(f"Calculated HR: {calc_hr:.2f} bpm")
+            
+            #write_influx(influx= influx, unit=unit,table_name=table_name, data_name='value', data=wave, start_timestamp=start_time, fs = samples)
+            simulated_data.append(list(wave)+[start_time]+[hr]+[rr])
             time.sleep(ibi)  ##IBI
     except KeyboardInterrupt:
         print('End')
+    simulated_data = np.asarray(simulated_data)
+    #np.save(f'hr_{hr:.1f}_rr_{rr:.1f}_{init_time}',simulated_data)
+    print('Data Saved')
 
 
 if __name__== '__main__':
@@ -75,12 +92,13 @@ if __name__== '__main__':
     parser.add_argument("--end", type=str, default=None, help='end time')        
     parser.add_argument('--wave_type', type=str, default='sine',
                         help='the input wave shape')       
-    parser.add_argument('--hr', type=int, default='40',
+    parser.add_argument('--hr', type=int, default='140',
                         help='the sampling rate of DAC board, divisible by 4096')                                
     parser.add_argument('--amplitude', type=int, default='1024', 
                         help='the strength of signal')
-    parser.add_argument('--rr', type=int, default=20, help='rr duration')
+    parser.add_argument('--rr', type=int, default=15, help='rr duration')
     parser.add_argument('--ibi_interval', type=int, default=0, help='rr duration')
+    parser.add_argument('--duration', type=int, default=60, help='duration in seconds')
 
     args = parser.parse_args()
     main(args)
