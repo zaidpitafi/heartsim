@@ -43,8 +43,8 @@ def sine_gen (amp, samples, hb, freq):
     sine_wave = np.tile(sine_wave,hb)  
     return sine_wave
 
-def sine_gen_with_rr (amp, samples, duration, freq, rr):
-    freq_hr = freq       # Frequency in Hz
+def sine_gen_with_rr (amp, samples, duration, hr, rr):
+    freq_hr = hr/60       # Frequency in Hz
     freq_rr = rr/60
     hr_amp = amp       # Amplitude of the sine wave
     rr_amp = 0.2*hr_amp
@@ -62,10 +62,23 @@ def sine_gen_with_rr (amp, samples, duration, freq, rr):
     sine_wave = rr_wave + hr_wave
     return sine_wave
 
-def sine_gen_old(amp, samples):
+def sine_gen_with_rr_v2(amp, samples, duration, hr, rr):
+    wave=[]
+    f_hr = hr/60
+    f_rr = rr/60
+    amp_rr = amp*0.2
+    for i in range(0,duration*samples):
+        val_hr = amp + int(amp * (math.sin(2 * math.pi * f_hr * i/samples)))
+        val_rr = amp_rr + int(amp_rr * (math.sin(2 * math.pi * f_rr * i/samples)))
+        val = val_hr #+ val_rr
+        wave.append(val)    
+    
+    return wave
+
+
+def sine_gen_old(amp, samples, freq):
     sine_wave=[]
-    step_size = int(4095/samples)
-    for i in range(0,4095,step_size):
+    for i in range(0,samples):
         val = amp + int(amp * (math.sin(2 * math.pi * i/4095)))
         sine_wave.append(val)    
     return sine_wave
