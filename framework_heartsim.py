@@ -50,20 +50,21 @@ def main(args):
     elif args.wave_type == 'scg':
         wave= scg_gen(amplitude,samples)
     elif args.wave_type == 'hat':
-        wave= mexhat_gen(amplitude,samples)
+        wave= mexhat_gen(amplitude,samples,duration,hr)
     elif args.wave_type == 'sym4':
-        wave= sym4_gen(amplitude,samples)
+        wave= sym4_gen(amplitude,samples,duration,hr)
+    elif args.wave_type == 'db12':
+        wave= db12_gen(amplitude,samples,duration,hr)
 
     # wave = rr_gen_ming(wave, rr)
     simulated_data = []
     diff = 0
     init_time = time.time()
     init_time = epoch_to_datetime_est(init_time)
-    k = 10
+    k = 18
     try:
         while(k>0):
             wave = sine_gen_with_rr_v2(amplitude, samples, duration, hr, rr)
-            # wave = sine_gen_old(amplitude,samples)
             start_time = time.time()
             print('Start time:', start_time)
             for i in range(0,len(wave)-1):
@@ -82,19 +83,19 @@ def main(args):
 
             calc_hr = 60 * frequ
             # print("Actual Diff", diff)
-            # print(f"Calculated HR: {calc_hr:.2f} bpm")
+            print(f"Calculated HR: {calc_hr:.2f} bpm")
             print(len(wave))
             
             #write_influx(influx= influx, unit=unit,table_name=table_name, data_name='value', data=wave, start_timestamp=start_time, fs = samples)
             simulated_data.append(list(wave)+[start_time]+[hr]+[rr])
             time.sleep(ibi)  ##IBI
             k -=1
-            # hr +=10
+            hr +=10
             
     except KeyboardInterrupt:
         print('End')
     simulated_data = np.asarray(simulated_data)
-    #np.save(f'hr_{hr:.1f}_rr_{rr:.1f}_{init_time}',simulated_data)
+    np.save(f'hr_{hr:.1f}_rr_{rr:.1f}_{init_time}',simulated_data)
     print('Data Saved')
 
 
@@ -103,15 +104,15 @@ if __name__== '__main__':
     parser.add_argument("--unit", type=str, help='BDot MAC address', default='12:02:12:02:12:02')
     parser.add_argument("--start", type=str, default=None, help='start time')
     parser.add_argument("--end", type=str, default=None, help='end time')        
-    parser.add_argument('--wave_type', type=str, default='sine',
+    parser.add_argument('--wave_type', type=str, default='hat',
                         help='the input wave shape')       
-    parser.add_argument('--hr', type=int, default='120',
+    parser.add_argument('--hr', type=int, default='42',
                         help='the sampling rate of DAC board, divisible by 4096')                                
-    parser.add_argument('--amplitude', type=int, default='798', 
+    parser.add_argument('--amplitude', type=int, default='2047', 
                         help='the strength of signal')
     parser.add_argument('--rr', type=int, default=10, help='rr duration')
     parser.add_argument('--ibi_interval', type=int, default=0, help='rr duration')
-    parser.add_argument('--duration', type=int, default=60, help='duration in seconds')
+    parser.add_argument('--duration', type=int, default=120, help='duration in seconds')
 
     args = parser.parse_args()
     main(args)

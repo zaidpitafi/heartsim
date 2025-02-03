@@ -17,6 +17,51 @@ from scipy import signal
 import pywt
 import datetime
 import pytz
+from scipy import signal
+
+def sine_gen_with_rr_v2(amp, samples, duration, hr, rr):
+    wave=[]
+    f_hr = hr/60
+    f_rr = rr/60
+    amp_rr = amp*0.2
+    for i in range(0,duration*samples):
+        val_hr = amp + int(amp * (math.sin(2 * math.pi * f_hr * i/samples)))
+        val_rr = amp_rr + int(amp_rr * (math.sin(2 * math.pi * f_rr * i/samples)))
+        val = val_hr #+ val_rr
+        wave.append(val)    
+    
+    return wave
+
+def sym4_gen(amp,samples, duration, hr):
+    reps = int(duration*hr/60) 
+
+    wavelet = pywt.Wavelet('sym4')
+    phi, psi, x = wavelet.wavefun(level=3)
+    
+    phi = ((phi-np.min(phi))/(np.max(phi)-np.min(phi)) * amp)
+    phi = signal.resample(phi, samples)
+    phi = np.tile(phi,reps)
+    return phi
+
+def db12_gen(amp,samples, duration, hr):
+    reps = int(duration*hr/60) 
+
+    wavelet = pywt.Wavelet('db12')
+    phi, psi, x = wavelet.wavefun(level=3)
+    
+    phi = ((phi-np.min(phi))/(np.max(phi)-np.min(phi)) * amp)
+    phi = signal.resample(phi, samples)
+    phi = np.tile(phi,reps)
+    return phi
+
+def mexhat_gen(amp, samples, duration, hr):
+    points = samples
+    reps = int(duration*hr/60)
+    a = 4 ##width
+    vec2 = signal.ricker(points, a)
+    vec2 = ((vec2-np.min(vec2))/(np.max(vec2)-np.min(vec2)) * amp)
+    vec2 = np.tile(vec2,reps)
+    return vec2
 
 def scg_gen(amp, step_size):
     scg = scg_simulate(length=step_size, duration=1)
@@ -62,39 +107,11 @@ def sine_gen_with_rr (amp, samples, duration, hr, rr):
     sine_wave = rr_wave + hr_wave
     return sine_wave
 
-def sine_gen_with_rr_v2(amp, samples, duration, hr, rr):
-    wave=[]
-    f_hr = hr/60
-    f_rr = rr/60
-    amp_rr = amp*0.2
-    for i in range(0,duration*samples):
-        val_hr = amp + int(amp * (math.sin(2 * math.pi * f_hr * i/samples)))
-        val_rr = amp_rr + int(amp_rr * (math.sin(2 * math.pi * f_rr * i/samples)))
-        val = val_hr #+ val_rr
-        wave.append(val)    
-    
-    return wave
 
 
-def sine_gen_old(amp, samples, freq):
-    sine_wave=[]
-    for i in range(0,samples):
-        val = amp + int(amp * (math.sin(2 * math.pi * i/4095)))
-        sine_wave.append(val)    
-    return sine_wave
 
-def mexhat_gen(amp, step_size):
-    points = step_size
-    a = 4 ##width
-    vec2 = signal.ricker(points, a)
-    vec2 = np.tile(vec2,10)
-    return vec2
 
-def sym4_gen(amp,step_size):
-    wavelet = pywt.Wavelet('sym4')
-    phi, psi, x = wavelet.wavefun(level=10)
-    psi = np.tile(psi,10)
-    return psi
+
 
 def rr_gen_ming(in_sig, respiratory_rate):
     print(len(in_sig))
@@ -106,6 +123,14 @@ def rr_gen_ming(in_sig, respiratory_rate):
     in_sig += rr_component
 
     return in_sig
+
+def sine_gen_old(amp, samples, freq):
+    sine_wave=[]
+    for i in range(0,samples):
+        val = amp + int(amp * (math.sin(2 * math.pi * i/4095)))
+        sine_wave.append(val)    
+    return sine_wave
+
 
 def rr_gen(rr, samples):
     fs = samples  # Sampling frequency in Hz
