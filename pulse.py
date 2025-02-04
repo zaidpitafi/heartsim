@@ -39,8 +39,10 @@ def sym4_gen(amp,samples, duration, hr):
     phi, psi, x = wavelet.wavefun(level=3)
     
     phi = ((phi-np.min(phi))/(np.max(phi)-np.min(phi)) * amp)
-    phi = signal.resample(phi, samples)
+    
     phi = np.tile(phi,reps)
+    phi = signal.resample(phi, samples*duration)
+    phi = abs(phi)
     return phi
 
 def db12_gen(amp,samples, duration, hr):
@@ -50,17 +52,21 @@ def db12_gen(amp,samples, duration, hr):
     phi, psi, x = wavelet.wavefun(level=3)
     
     phi = ((phi-np.min(phi))/(np.max(phi)-np.min(phi)) * amp)
-    phi = signal.resample(phi, samples)
+    
     phi = np.tile(phi,reps)
+    phi = signal.resample(phi, samples*duration)
+    phi = abs(phi)
     return phi
 
 def mexhat_gen(amp, samples, duration, hr):
     points = samples
     reps = int(duration*hr/60)
     a = 4 ##width
-    vec2 = signal.ricker(points, a)
+    vec2 = signal.ricker(100, a)
     vec2 = ((vec2-np.min(vec2))/(np.max(vec2)-np.min(vec2)) * amp)
     vec2 = np.tile(vec2,reps)
+    vec2 = signal.resample(vec2, samples*duration)
+    vec2 = abs(vec2)
     return vec2
 
 def scg_gen(amp, step_size):
@@ -106,11 +112,6 @@ def sine_gen_with_rr (amp, samples, duration, hr, rr):
     
     sine_wave = rr_wave + hr_wave
     return sine_wave
-
-
-
-
-
 
 
 def rr_gen_ming(in_sig, respiratory_rate):
@@ -165,3 +166,18 @@ def epoch_to_datetime_est(epoch_time):
     
     return dt_est
     
+def sine_gen_with_rr_v3(amp, samples, duration, hr, rr):
+    f_rr = rr/60
+    f_hr = hr/60
+    sampling_rate = samples
+
+    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
+
+    sine_wave = np.sin(2 * np.pi * f_hr * t)
+
+    breathing_effect = (np.sin(2 * np.pi * f_rr * t) + 1) / 2
+
+    wave = sine_wave * breathing_effect
+    wave = amp + amp*wave
+    return wave
+

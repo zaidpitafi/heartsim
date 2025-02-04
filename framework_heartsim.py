@@ -43,8 +43,7 @@ def main(args):
     dac = a.MCP4725(i2c, address=0x60)
 
     if args.wave_type == 'sine':
-        # wave = sine_gen_with_rr(amplitude, samples, duration, hr, rr)
-        wave = sine_gen_with_rr_v2(amplitude, samples, duration, hr, rr)
+        wave = sine_gen_with_rr_v3(amplitude, samples, duration, hr, rr)
     elif args.wave_type == 'ecg':
         wave= ecg_gen(amplitude,samples)
     elif args.wave_type == 'scg':
@@ -68,9 +67,9 @@ def main(args):
             print('Start time:', start_time)
             for i in range(0,len(wave)-1):
                 val = int(wave[i])
-                dac.raw_value = val
                 # print(wave[i])
-                delay = delay_req - 0.00041     # inherent delay of DAC is subtracted
+                dac.raw_value = val
+                delay = delay_req - 0.00041     # inherent delay of DAC is subtracted, 0.00041 
                 time.sleep(delay)
             end_time = time.time()
             print('End time:', end_time)
@@ -94,7 +93,7 @@ def main(args):
     except KeyboardInterrupt:
         print('End')
     simulated_data = np.asarray(simulated_data)
-    np.save(f'wave_{args.wave_type}',simulated_data)
+    np.save(f'wave_{args.wave_type}_{init_time}',simulated_data)
     print('Data Saved')
 
 
@@ -111,7 +110,7 @@ if __name__== '__main__':
                         help='the strength of signal')
     parser.add_argument('--rr', type=int, default=10, help='rr duration')
     parser.add_argument('--ibi_interval', type=int, default=0, help='rr duration')
-    parser.add_argument('--duration', type=int, default=120, help='duration in seconds')
+    parser.add_argument('--duration', type=int, default=60, help='duration in seconds')
 
     args = parser.parse_args()
     main(args)
