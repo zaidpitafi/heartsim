@@ -181,3 +181,41 @@ def sine_gen_with_rr_v3(amp, samples, duration, hr, rr):
     wave = amp + amp*wave
     return wave
 
+
+
+def generate_wave_array(i):
+    # Generate the increasing part (from 0.1 to i/2 with step 0.1)
+    step = 0.1
+    half_length = int(i // 2)
+    increasing_part = np.arange(step, (half_length + 1) * step, step)
+    
+    # Generate the decreasing part (reverse of the increasing part, excluding the last value)
+    # decreasing_part = increasing_part[-2::-1]  # Skip the last element to avoid repetition
+    decreasing_part = increasing_part[-2:]
+    # Combine both parts
+    wave_array = np.concatenate((increasing_part, decreasing_part))
+    return wave_array
+
+def generate_increasing_amplitude_wave_array(i):
+    # Create an array starting from 1.1, increasing by 0.1 up to length i
+    step = 0.1
+    wave_array = np.arange(1.1, 1.1 + step * i, step)
+    return wave_array
+
+def sine_gen_with_rr_v4(amp, samples, duration, hr, rr):
+    wave = sine_gen_with_rr_v3(2047, 410, 1, 60, rr)
+    max_amp = 4094
+
+    val = int(hr/rr)
+    reps = int(rr/60*duration)
+    scaling_factors = generate_increasing_amplitude_wave_array(val)
+
+    rsa = np.tile(wave, len(scaling_factors)) * np.repeat(scaling_factors, len(wave))
+
+    rsa_norm = ((rsa-np.min(rsa))/(np.max(rsa)-np.min(rsa)) * max_amp)
+
+    wave_f = np.tile(rsa_norm,reps)
+
+    wave = signal.resample(wave_f,duration*samples)
+    wave = abs(wave)
+    return wave
