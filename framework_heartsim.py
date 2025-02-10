@@ -28,7 +28,7 @@ def main(args):
     hr = args.hr
     duration = args.duration
     freq = hr/60
-    samples = 410  ## number of points from DAC 
+    samples = args.sampling_rate  ## number of points from DAC 
     delay_req = 1/(samples)
     amplitude = args.amplitude  ### Strength of the Signal
     
@@ -60,7 +60,7 @@ def main(args):
     diff = 0
     init_time = time.time()
     init_time = epoch_to_datetime_est(init_time)
-    k = 15
+    k = 10
     try:
         while(k>0):
             wave= sine_gen_with_rr_v4(amplitude,samples,duration,hr,rr)
@@ -68,7 +68,7 @@ def main(args):
             print('Start time:', start_time)
             for i in range(0,len(wave)-1):
                 val = int(wave[i])
-                #print(wave[i])
+                # print(wave[i])
                 dac.raw_value = val
                 delay = delay_req - 0.00041     # inherent delay of DAC is subtracted, 0.00041 
                 time.sleep(delay)
@@ -107,11 +107,13 @@ if __name__== '__main__':
                         help='the input wave shape')       
     parser.add_argument('--hr', type=int, default='42',
                         help='the sampling rate of DAC board, divisible by 4096')                                
-    parser.add_argument('--amplitude', type=int, default='128', 
+    parser.add_argument('--amplitude', type=int, default='2047', 
                         help='the strength of signal')
-    parser.add_argument('--rr', type=int, default=12, help='rr duration')
+    parser.add_argument('--sampling_rate', type=int, default='410', 
+                        help='the strength of signal')
+    parser.add_argument('--rr', type=int, default=36, help='rr duration')
     parser.add_argument('--ibi_interval', type=int, default=0, help='rr duration')
-    parser.add_argument('--duration', type=int, default=60, help='duration in seconds')
+    parser.add_argument('--duration', type=int, default=20, help='duration in seconds')
 
     args = parser.parse_args()
     main(args)

@@ -198,12 +198,12 @@ def generate_wave_array(i):
 
 def generate_increasing_amplitude_wave_array(i):
     # Create an array starting from 1.1, increasing by 0.1 up to length i
-    step = 0.1
-    wave_array = np.arange(1.1, 1.1 + step * i, step)
+    step = 0.2
+    wave_array = np.arange(1, 1 + step * i, step)
     return wave_array
 
 def sine_gen_with_rr_v4(amp, samples, duration, hr, rr):
-    wave = sine_gen_with_rr_v3(2047, 410, 1, 60, rr)
+    wave = sine_gen_with_rr_v3(amp, samples, 1, 60, rr)
     max_amp = 4094
 
     val = int(hr/rr)
