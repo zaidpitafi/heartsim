@@ -59,11 +59,12 @@ def main(args):
     simulated_data = []
     diff = 0
     init_time = time.time()
-    init_time = epoch_to_datetime_est(init_time)
+    # init_time = epoch_to_datetime_est(init_time)
     k = 10
     try:
         while(k>0):
             wave= sine_gen_with_rr_v4(amplitude,samples,duration,hr,rr)
+            # wave= mexhat_gen_with_rr(amplitude, samples, duration, hr, rr)
             start_time = time.time()
             print('Start time:', start_time)
             for i in range(0,len(wave)-1):
@@ -94,7 +95,7 @@ def main(args):
     except KeyboardInterrupt:
         print('End')
     simulated_data = np.asarray(simulated_data)
-    # np.save(f'wave_{args.wave_type}_{init_time}',simulated_data)
+    np.save(f'wave_{args.wave_type}_rr_{args.rr}_time_{init_time}',simulated_data)
     print('Data Saved')
 
 
@@ -111,9 +112,9 @@ if __name__== '__main__':
                         help='the strength of signal')
     parser.add_argument('--sampling_rate', type=int, default='410', 
                         help='the strength of signal')
-    parser.add_argument('--rr', type=int, default=36, help='rr duration')
-    parser.add_argument('--ibi_interval', type=int, default=0, help='rr duration')
-    parser.add_argument('--duration', type=int, default=20, help='duration in seconds')
+    parser.add_argument('--rr', type=int, default=40, help='rr duration')
+    parser.add_argument('--ibi_interval', type=float, default=0, help='rr duration')
+    parser.add_argument('--duration', type=int, default=120, help='duration in seconds')
 
     args = parser.parse_args()
     main(args)

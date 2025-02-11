@@ -198,12 +198,30 @@ def generate_wave_array(i):
 
 def generate_increasing_amplitude_wave_array(i):
     # Create an array starting from 1.1, increasing by 0.1 up to length i
-    step = 0.2
+    step = 0.05
     wave_array = np.arange(1, 1 + step * i, step)
     return wave_array
 
 def sine_gen_with_rr_v4(amp, samples, duration, hr, rr):
     wave = sine_gen_with_rr_v3(amp, samples, 1, 60, rr)
+    max_amp = 4094
+
+    val = int(hr/rr)
+    reps = int(rr/60*duration)
+    scaling_factors = generate_increasing_amplitude_wave_array(val)
+
+    rsa = np.tile(wave, len(scaling_factors)) * np.repeat(scaling_factors, len(wave))
+
+    rsa_norm = ((rsa-np.min(rsa))/(np.max(rsa)-np.min(rsa)) * max_amp)
+
+    wave_f = np.tile(rsa_norm,reps)
+
+    wave = signal.resample(wave_f,duration*samples)
+    wave = abs(wave)
+    return wave
+
+def mexhat_gen_with_rr(amp, samples, duration, hr, rr):
+    wave = mexhat_gen(amp, samples, 1, 60)
     max_amp = 4094
 
     val = int(hr/rr)
