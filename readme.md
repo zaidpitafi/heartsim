@@ -12,7 +12,8 @@
 - Power Amplifier [OPA541](https://www.ti.com/lit/ds/symlink/opa541.pdf?ts=1736251871643&ref_url=https%253A%252F%252Fwww.mouser.cn%252F)
 - Independent [Power Supply] (https://a.co/d/hWlwYX6) 
 
-
+![Flow Chart](arch.png)
+![Installation](pic.jpg)
 
 ### The frequency of sine wave  is calculated by = 1/(sampling rate)
 ### The Heart Rate is found by multiplying frequency by 60
