@@ -1,3 +1,8 @@
+## Table of Contents
+- [Installation](#installation)
+- [Usage](#usage) 
+
+
 ### The frequency of sine wave  is calculated by = 1/(sampling rate)
 ### The Heart Rate is found by multiplying frequency by 60
 
