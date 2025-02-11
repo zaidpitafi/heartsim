@@ -1,6 +1,17 @@
 ## Table of Contents
 - [Installation](#installation)
-- [Usage](#usage) 
+- [Usage](#usage)
+
+## Prerequisites
+- Python 3.8 or higher
+
+## Installation
+- Controller Board: [Raspberry Pi 4 Model B Rev 1.4](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/)
+- Motor [60VC003](https://www.smoothmotor.com/video/products-detail-3207327)
+- DAC Board [MCP4725](https://www.microchip.com/en-us/product/mcp4725)
+- Power Amplifier [OPA541](https://www.ti.com/lit/ds/symlink/opa541.pdf?ts=1736251871643&ref_url=https%253A%252F%252Fwww.mouser.cn%252F)
+- Independent [Power Supply] (https://a.co/d/hWlwYX6) 
+
 
 
 ### The frequency of sine wave  is calculated by = 1/(sampling rate)
