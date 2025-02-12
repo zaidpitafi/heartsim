@@ -28,6 +28,7 @@
 ### Example Usage
 '
 python3 framework_simulator.py --wave_type='sine' --hr=80 --rr=12 --amplitude=2048 --duration=120
+'
 
 - The frequency of sine wave  is calculated by = 1/(sampling rate)
 - The Heart Rate is found by multiplying frequency by 60 
