@@ -16,6 +16,7 @@
 ![Installation](pic.jpg)
 
 ## Usage
+
 - To Run the simulator code, use the framework_heartsim.py file and provide following arguments
 - --wave_type (type of wave to simulate e.g., sine, mexican hat, sym4, scg, ecg)
 - --ibi_interval (in milliseconds)
@@ -23,6 +24,10 @@
 - --rr
 - --amplitude (maximum is 2048, default is 1024)
 - --duration (The duration of signal in seconds)
+
+### Example Usage
+'
+python3 framework_simulator.py --wave_type='sine' --hr=80 --rr=12 --amplitude=2048 --duration=120
 
 - The frequency of sine wave  is calculated by = 1/(sampling rate)
 - The Heart Rate is found by multiplying frequency by 60 
