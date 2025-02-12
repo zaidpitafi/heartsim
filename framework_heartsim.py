@@ -110,12 +110,12 @@ if __name__== '__main__':
                         help='the input wave shape')       
     parser.add_argument('--hr', type=int, default='42',
                         help='the sampling rate of DAC board, divisible by 4096')                                
-    parser.add_argument('--amplitude', type=int, default='2047', 
+    parser.add_argument('--amplitude', type=int, default='4094', 
                         help='the strength of signal')
     parser.add_argument('--sampling_rate', type=int, default='410', 
                         help='the strength of signal')
-    parser.add_argument('--rr', type=int, default=40, help='rr duration')
-    parser.add_argument('--rr_step', type=float, default=0.15, help='rr envelope step')
+    parser.add_argument('--rr', type=int, default=12, help='rr duration')
+    parser.add_argument('--rr_step', type=float, default=0.10, help='rr envelope step')
     parser.add_argument('--ibi_interval', type=float, default=0, help='rr duration')
     parser.add_argument('--duration', type=int, default=120, help='duration in seconds')
 
