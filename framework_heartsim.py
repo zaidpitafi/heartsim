@@ -66,6 +66,7 @@ def main(args):
     try:
         while(k>0):
             wave= sine_gen_with_rr_v4(amplitude,samples,duration,hr,rr, rr_step)
+            # wave= sine_gen_with_rr_v3(amplitude,samples,duration,hr,rr)
             # wave= mexhat_gen_with_rr(amplitude, samples, duration, hr, rr)
             start_time = time.time()
             print('Start time:', start_time)
@@ -92,7 +93,7 @@ def main(args):
             simulated_data.append(list(wave)+[start_time]+[hr]+[rr])
             time.sleep(ibi)  ##IBI
             k -=1
-            hr +=12
+            # hr +=12
             
     except KeyboardInterrupt:
         print('End')
@@ -108,16 +109,16 @@ if __name__== '__main__':
     parser.add_argument("--end", type=str, default=None, help='end time')        
     parser.add_argument('--wave_type', type=str, default='sine',
                         help='the input wave shape')       
-    parser.add_argument('--hr', type=int, default='42',
+    parser.add_argument('--hr', type=int, default='84',
                         help='the sampling rate of DAC board, divisible by 4096')                                
-    parser.add_argument('--amplitude', type=int, default='4094', 
+    parser.add_argument('--amplitude', type=int, default='2047', 
                         help='the strength of signal')
     parser.add_argument('--sampling_rate', type=int, default='410', 
                         help='the strength of signal')
     parser.add_argument('--rr', type=int, default=12, help='rr duration')
-    parser.add_argument('--rr_step', type=float, default=0.10, help='rr envelope step')
+    parser.add_argument('--rr_step', type=float, default=0.15, help='rr envelope step')
     parser.add_argument('--ibi_interval', type=float, default=0, help='rr duration')
-    parser.add_argument('--duration', type=int, default=120, help='duration in seconds')
+    parser.add_argument('--duration', type=int, default=10, help='duration in seconds')
 
     args = parser.parse_args()
     main(args)

@@ -170,7 +170,7 @@ def sine_gen_with_rr_v3(amp, samples, duration, hr, rr):
     f_rr = rr/60
     f_hr = hr/60
     sampling_rate = samples
-    phase = 0 # np.pi/2
+    phase = np.pi/2
 
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
 
@@ -178,7 +178,7 @@ def sine_gen_with_rr_v3(amp, samples, duration, hr, rr):
 
     breathing_effect = (np.sin(2 * np.pi * f_rr * t) + 1) / 2
 
-    wave = sine_wave * breathing_effect
+    wave = sine_wave #* breathing_effect
     wave = amp + amp*wave
     return wave
 
@@ -208,7 +208,7 @@ def sine_gen_with_rr_v4(amp, samples, duration, hr, rr, rr_step):
     max_amp = 4094
 
     val = int(np.round(hr/rr))
-    reps = int(np.round(rr/duration*60))
+    reps = int(np.round(rr/60*duration))
 
     scaling_factors = generate_increasing_amplitude_wave_array(val, rr_step)
     # if len(scaling_factors) > 1:
