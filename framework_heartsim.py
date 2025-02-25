@@ -29,7 +29,7 @@ def main(args):
     duration = args.duration
     freq = hr/60
     samples = args.sampling_rate  ## number of points from DAC 
-    delay_req = 1/(samples)
+    delay_req = 1/(samples) ## 2 to avoid double counting
     amplitude = args.amplitude  ### Strength of the Signal
     rr_step = args.rr_step
     
@@ -65,14 +65,22 @@ def main(args):
     k = 10
     try:
         while(k>0):
+            # if hr>60:
+            #     amplitude = 4095
+
             wave= sine_gen_with_rr_v4(amplitude,samples,duration,hr,rr, rr_step)
-            # wave= sine_gen_with_rr_v3(amplitude,samples,duration,hr,rr)
-            # wave= mexhat_gen_with_rr(amplitude, samples, duration, hr, rr)
+            # wave = mexhat_gen_with_rr(amplitude, samples, duration, hr, rr, rr_step)
+            # wave = pulse_gen_with_rr(amplitude, samples, duration, hr, rr, rr_step)
+
+            # len_wave = int(len(wave)/2)
+            # wave = wave[:len_wave]
+
             start_time = time.time()
             print('Start time:', start_time)
             for i in range(0,len(wave)-1):
                 val = int(wave[i])
-                # print(wave[i])
+                #print(wave[i])
+                
                 dac.raw_value = val
                 delay = delay_req - 0.00041     # inherent delay of DAC is subtracted, 0.00041 
                 time.sleep(delay)
@@ -81,24 +89,24 @@ def main(args):
             total_time = (end_time - start_time)
             diff = end_time - start_time
             
-            total_cycles = hr
+            total_cycles = hr/60 * duration
             frequ = total_cycles/total_time
 
             calc_hr = 60 * frequ
             # print("Actual Diff", diff)
             print(f"Calculated HR: {calc_hr:.2f} bpm")
-            print('hr:', hr)
+            print('hr:', hr, "rr:", rr)
             
-            #write_influx(influx= influx, unit=unit,table_name=table_name, data_name='value', data=wave, start_timestamp=start_time, fs = samples)
-            simulated_data.append(list(wave)+[start_time]+[hr]+[rr])
+            simulated_data.append(list(wave)+[start_time]+[calc_hr]+[rr])
             time.sleep(ibi)  ##IBI
             k -=1
             # hr +=12
+            # rr +=4
             
     except KeyboardInterrupt:
         print('End')
     simulated_data = np.asarray(simulated_data)
-    np.save(f'wave_{args.wave_type}_rr_{args.rr}_step_{rr_step}_time_{init_time}',simulated_data)
+    # np.save(f'wave_{args.wave_type}_rr_{args.rr}_step_{rr_step}_time_{init_time}',simulated_data)
     print('Data Saved')
 
 
@@ -107,18 +115,18 @@ if __name__== '__main__':
     parser.add_argument("--unit", type=str, help='BDot MAC address', default='12:02:12:02:12:02')
     parser.add_argument("--start", type=str, default=None, help='start time')
     parser.add_argument("--end", type=str, default=None, help='end time')        
-    parser.add_argument('--wave_type', type=str, default='sine',
+    parser.add_argument('--wave_type', type=str, default='db12',
                         help='the input wave shape')       
-    parser.add_argument('--hr', type=int, default='84',
+    parser.add_argument('--hr', type=int, default=72,
                         help='the sampling rate of DAC board, divisible by 4096')                                
-    parser.add_argument('--amplitude', type=int, default='2047', 
+    parser.add_argument('--amplitude', type=int, default=1024, 
                         help='the strength of signal')
-    parser.add_argument('--sampling_rate', type=int, default='410', 
+    parser.add_argument('--sampling_rate', type=int, default=410, 
                         help='the strength of signal')
     parser.add_argument('--rr', type=int, default=12, help='rr duration')
-    parser.add_argument('--rr_step', type=float, default=0.15, help='rr envelope step')
+    parser.add_argument('--rr_step', type=float, default=0.1, help='rr envelope step')
     parser.add_argument('--ibi_interval', type=float, default=0, help='rr duration')
-    parser.add_argument('--duration', type=int, default=10, help='duration in seconds')
+    parser.add_argument('--duration', type=int, default=60, help='duration in seconds')
 
     args = parser.parse_args()
     main(args)
