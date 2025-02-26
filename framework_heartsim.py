@@ -115,7 +115,7 @@ if __name__== '__main__':
     parser.add_argument("--unit", type=str, help='BDot MAC address', default='12:02:12:02:12:02')
     parser.add_argument("--start", type=str, default=None, help='start time')
     parser.add_argument("--end", type=str, default=None, help='end time')        
-    parser.add_argument('--wave_type', type=str, default='db12',
+    parser.add_argument('--wave_type', type=str, default='sine',
                         help='the input wave shape')       
     parser.add_argument('--hr', type=int, default=72,
                         help='the sampling rate of DAC board, divisible by 4096')                                
