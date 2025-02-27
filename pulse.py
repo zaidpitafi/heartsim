@@ -58,17 +58,7 @@ def db12_gen(amp,samples, duration, hr):
     phi = abs(phi)
     return phi
 
-def mexhat_gen(amp, samples, duration, hr):
-    points = samples
-    reps = int(duration*hr/60)
-    a = 4 ##width
-    duty_cycle = 0.1  # 50% duty cycle
-    vec2 = signal.ricker(100, a) 
-    vec2 = ((vec2-np.min(vec2))/(np.max(vec2)-np.min(vec2)) * amp)
-    vec2 = np.tile(vec2,reps)
-    vec2 = signal.resample(vec2, samples*duration)
-    vec2 = abs(vec2)
-    return vec2
+
 
 def scg_gen(amp, step_size):
     scg = scg_simulate(length=step_size, duration=1)
@@ -134,6 +124,27 @@ def sine_gen_old(amp, samples, freq):
     return sine_wave
 
 
+def sine_gen_with_rr_dc(amp, samples, duty_cycle):
+
+    f_hr = 1
+    duration = 1
+    sampling_rate = samples
+    phase = 0
+
+    val = int(duty_cycle*samples)
+    rem = samples - val
+    zer_array = np.zeros(rem)
+  
+    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
+    
+    sine_wave = np.sin(2 * np.pi * f_hr * t - phase)
+    wave = sine_wave
+
+    wave = signal.resample(wave, val)
+    wave = np.concatenate((zer_array, wave),axis=0)
+
+    return wave
+
 def rr_gen(rr, samples):
     fs = samples  # Sampling frequency in Hz
     duration = 1  # Signal duration in seconds
@@ -167,23 +178,6 @@ def epoch_to_datetime_est(epoch_time):
     
     return dt_est
     
-def sine_gen_with_rr_v3(amp, samples, duration, hr):
-
-    f_hr = hr/60
-    sampling_rate = samples
-    phase = np.pi/2
-
-    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-
-    sine_wave = np.sin(2 * np.pi * f_hr * t - phase)
-
-    wave = sine_wave
-    
-    wave = (wave-np.min(wave))/(np.max(wave)-np.min(wave)) * amp
-    wave = abs(wave)
-    return wave
-
-
 
 def generate_wave_array(i):
     # Generate the increasing part (from 0.1 to i/2 with step 0.1)
@@ -204,11 +198,23 @@ def generate_increasing_amplitude_wave_array(i,step_size):
     wave_array = np.arange(1, 1 + step * i, step)
     return wave_array
 
+#################################################
+def mexhat_gen_base(amp, samples, duration, hr):
+    points = samples
+    reps = int(duration*hr/60)
+    a = 4 ##width
+    
+    vec2 = signal.ricker(100, a) 
+    vec2 = ((vec2-np.min(vec2))/(np.max(vec2)-np.min(vec2)) * amp)
+    vec2 = np.tile(vec2,reps)
+    vec2 = signal.resample(vec2, samples*duration)
+    vec2 = abs(vec2)
+    return vec2
 
 
-def mexhat_gen_with_rr(amp, samples, duration, hr, rr, rr_step):
-    wave = mexhat_gen(amp, samples, 1, 60)
-    max_amp = 4094
+def mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step):
+
+    wave = mexhat_gen_base(max_amp, samples, 1, 60)
 
     val = int(hr/rr)
     reps = int(rr/60*duration)
@@ -216,19 +222,23 @@ def mexhat_gen_with_rr(amp, samples, duration, hr, rr, rr_step):
 
     rsa = np.tile(wave, len(scaling_factors)) * np.repeat(scaling_factors, len(wave))
 
-    rsa_norm = ((rsa-np.min(rsa))/(np.max(rsa)-np.min(rsa)) * max_amp)
+    # rsa_norm = ((rsa-np.min(rsa))/(np.max(rsa)-np.min(rsa)) * max_amp)
 
-    wave_f = np.tile(rsa_norm,reps)
+    wave_f = np.tile(rsa,reps)
 
     wave = signal.resample(wave_f,duration*samples)
+
+    wave = min_amp + ((wave - np.min(wave)) / (np.max(wave) - np.min(wave))) * (max_amp - min_amp)
     wave = abs(wave)
+
     return wave
 
-def pulse_base(amp, samples, duration):
+def pulse_base(amp, samples, duty_cycle):
     # Parameters
     fs = samples  # Sampling frequency in Hz
+    duration = 1
     t = np.linspace(0, duration, fs, endpoint=False)  # 1 second duration
-    duty_cycle = 0.5  # 50% duty cycle
+    
     f_hr = 1
     # Generate pulse waveform
     pulse_wave = (np.sin(2 * np.pi * f_hr * t) >= np.cos(np.pi * duty_cycle)).astype(int)
@@ -239,8 +249,11 @@ def pulse_base(amp, samples, duration):
     pulse_wave = abs(pulse_wave)
     return pulse_wave
 
-def pulse_gen_with_rr(amp, samples, duration, hr, rr, rr_step):
-    wave_a = pulse_base(amp, samples, 1)
+def pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step):
+
+    duty_cycle = 0.1
+
+    wave_a = pulse_base(max_amp, samples, duty_cycle)
 
     val = int(np.round(hr/rr))
     reps = int(np.round(rr/60*duration))
@@ -253,38 +266,43 @@ def pulse_gen_with_rr(amp, samples, duration, hr, rr, rr_step):
     
     wave_f = np.tile(rsa,reps)
     new_length = duration*samples
-    wave_f = np.interp(np.linspace(0, len(wave_f)-1, new_length), 
+    wave = np.interp(np.linspace(0, len(wave_f)-1, new_length), 
                             np.arange(len(wave_f)), 
                             wave_f)
 
     
-    wave_f = ((wave_f-np.min(wave_f))/(np.max(wave_f)-np.min(wave_f)) * amp)
-
-    wave = abs(wave_f)
+    # wave = ((wave_f-np.min(wave_f))/(np.max(wave_f)-np.min(wave_f)) * amp)
+    wave = min_amp + ((wave - np.min(wave)) / (np.max(wave) - np.min(wave))) * (max_amp - min_amp)
+    wave = abs(wave)
     return wave
 
-def sine_gen_with_rr_dc(amp, samples):
+def sine_gen_with_rr_base(amp, samples):
 
     f_hr = 1
     duration = 1
     sampling_rate = samples
-    phase = np.pi/2
-    zer_array = np.zeros(210)
-  
-    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    
-    sine_wave = np.sin(2 * np.pi * f_hr * t - phase)
-    wave = sine_wave
+    phase = 0
 
-    wave = (wave-np.min(wave))/(np.max(wave)-np.min(wave)) * amp
-    wave = signal.resample(wave, 200)
-    wave = np.concatenate((zer_array, wave),axis=0)
-    wave = abs(wave)
+    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
+
+    sine_wave = np.sin(2 * np.pi * f_hr * t - phase)
+
+    wave = sine_wave
+    
     return wave
 
-def sine_gen_with_rr_v4(amp, samples, duration, hr, rr, rr_step):
-    # wave = sine_gen_with_rr_v3(amp, samples, 1, 60)
-    wave = sine_gen_with_rr_dc(amp, samples)
+
+
+def sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step):
+
+    min_val = min_amp
+    max_val = max_amp
+
+    duty_cycle = 0.05
+
+    ## Select base sine wave - with or without Duty Cycle
+    wave = sine_gen_with_rr_base(max_val, samples)
+    # wave = sine_gen_with_rr_dc(max_val, samples, duty_cycle)
 
     val = int(np.round(hr/rr))
     reps = int(np.round(rr/60*duration))
@@ -294,14 +312,16 @@ def sine_gen_with_rr_v4(amp, samples, duration, hr, rr, rr_step):
         scaling_factors = scaling_factors[:-1]
 
     rsa = np.tile(wave, len(scaling_factors)) * np.repeat(scaling_factors, len(wave))
-    
-    min_val = 64
-    max_val = 512
 
     wave_f = np.tile(rsa,reps)
 
-    wave = signal.resample(wave_f,duration*samples)
+    ## Resample to intended duration
+    new_length = duration*samples
+    wave = np.interp(np.linspace(0, len(wave_f)-1, new_length), np.arange(len(wave_f)), wave_f)
+    
+    ## Select Normalization
     # wave = ((wave-np.min(wave))/(np.max(wave)-np.min(wave)) * amp)
     wave = min_val + ((wave - np.min(wave)) / (np.max(wave) - np.min(wave))) * (max_val - min_val)
+    
     wave = abs(wave)
     return wave

@@ -30,11 +30,9 @@ def main(args):
     freq = hr/60
     samples = args.sampling_rate  ## number of points from DAC 
     delay_req = 1/(samples) ## 2 to avoid double counting
-    amplitude = args.amplitude  ### Strength of the Signal
+    min_amp = args.min_amp  ### Strength of the Signal
+    max_amp = args.max_amp
     rr_step = args.rr_step
-    
-
-    hb = int(freq * duration)
 
     ibi = args.ibi_interval
     unit = args.unit
@@ -44,63 +42,55 @@ def main(args):
     dac = a.MCP4725(i2c, address=0x60)
 
     if args.wave_type == 'sine':
-        wave = sine_gen_with_rr_v2(amplitude, samples, duration, hr, rr)
+        wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step)
     elif args.wave_type == 'ecg':
-        wave= ecg_gen(amplitude,samples)
+        wave= ecg_gen(max_amp,samples)
     elif args.wave_type == 'scg':
-        wave= scg_gen(amplitude,samples)
+        wave= scg_gen(max_amp,samples)
     elif args.wave_type == 'hat':
-        wave= mexhat_gen(amplitude,samples,duration,hr)
+        wave= mexhat_gen(max_amp,samples,duration,hr)
     elif args.wave_type == 'sym4':
-        wave= sym4_gen(amplitude,samples,duration,hr)
+        wave= sym4_gen(max_amp,samples,duration,hr)
     elif args.wave_type == 'db12':
-        wave= db12_gen(amplitude,samples,duration,hr)
+        wave= db12_gen(max_amp,samples,duration,hr)
 
-    # wave = rr_gen_ming(wave, rr)
     simulated_data = []
-    diff = 0
-    init_time = time.time()
-    init_time = int(init_time)
-    # init_time = epoch_to_datetime_est(init_time)
+    init_time = int(time.time())
+
     k = 10
+
     try:
         while(k>0):
-            # if hr>60:
-            #     amplitude = 4095
+            # if hr<60 and (max_amp-min_amp)<600:
+            #     rr_step = 0.1
 
-            wave= sine_gen_with_rr_v4(amplitude,samples,duration,hr,rr, rr_step)
-            # wave = mexhat_gen_with_rr(amplitude, samples, duration, hr, rr, rr_step)
-            # wave = pulse_gen_with_rr(amplitude, samples, duration, hr, rr, rr_step)
-
-            # len_wave = int(len(wave)/2)
-            # wave = wave[:len_wave]
+            #### Select Wave Here
+            # wave = mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
+            wave = pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
 
             start_time = time.time()
             print('Start time:', start_time)
             for i in range(0,len(wave)-1):
+
                 val = int(wave[i])
-                #print(wave[i])
-                
                 dac.raw_value = val
                 delay = delay_req - 0.00041     # inherent delay of DAC is subtracted, 0.00041 
                 time.sleep(delay)
             end_time = time.time()
             print('End time:', end_time)
             total_time = (end_time - start_time)
-            diff = end_time - start_time
             
             total_cycles = hr/60 * duration
             frequ = total_cycles/total_time
 
             calc_hr = 60 * frequ
-            # print("Actual Diff", diff)
             print(f"Calculated HR: {calc_hr:.2f} bpm")
             print('hr:', hr, "rr:", rr)
             
             simulated_data.append(list(wave)+[start_time]+[calc_hr]+[rr])
             time.sleep(ibi)  ##IBI
             k -=1
-            # hr +=12
+            hr +=12
             # rr +=4
             
     except KeyboardInterrupt:
@@ -112,21 +102,23 @@ def main(args):
 
 if __name__== '__main__':
     parser = argparse.ArgumentParser(description='Heartbeat Simulator', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--unit", type=str, help='BDot MAC address', default='12:02:12:02:12:02')
+    parser.add_argument("--unit", type=str, help='BDot MAC address to Post Labels', default='12:02:12:02:12:02')
     parser.add_argument("--start", type=str, default=None, help='start time')
     parser.add_argument("--end", type=str, default=None, help='end time')        
-    parser.add_argument('--wave_type', type=str, default='sine',
+    parser.add_argument('--wave_type', type=str, default='pulse',
                         help='the input wave shape')       
-    parser.add_argument('--hr', type=int, default=72,
-                        help='the sampling rate of DAC board, divisible by 4096')                                
-    parser.add_argument('--amplitude', type=int, default=1024, 
-                        help='the strength of signal')
-    parser.add_argument('--sampling_rate', type=int, default=410, 
-                        help='the strength of signal')
-    parser.add_argument('--rr', type=int, default=12, help='rr duration')
+    parser.add_argument('--hr', type=int, default=42,
+                        help='the desired Heart Rate')
+    parser.add_argument('--rr', type=int, default=12, help='The desired Respiratory Rate')
     parser.add_argument('--rr_step', type=float, default=0.1, help='rr envelope step')
-    parser.add_argument('--ibi_interval', type=float, default=0, help='rr duration')
-    parser.add_argument('--duration', type=int, default=60, help='duration in seconds')
+    parser.add_argument('--min_amp', type=int, default=0, 
+                        help='the min strength of signal')                                
+    parser.add_argument('--max_amp', type=int, default=512, 
+                        help='the max strength of signal')
+    parser.add_argument('--sampling_rate', type=int, default=410, 
+                        help='the number of samples')
+    parser.add_argument('--ibi_interval', type=float, default=0, help='inter beat interval')
+    parser.add_argument('--duration', type=int, default=30, help='duration in seconds')
 
     args = parser.parse_args()
     main(args)
