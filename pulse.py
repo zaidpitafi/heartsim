@@ -124,27 +124,6 @@ def sine_gen_old(amp, samples, freq):
     return sine_wave
 
 
-def sine_gen_with_rr_dc(amp, samples, duty_cycle):
-
-    f_hr = 1
-    duration = 1
-    sampling_rate = samples
-    phase = 0
-
-    val = int(duty_cycle*samples)
-    rem = samples - val
-    zer_array = np.zeros(rem)
-  
-    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    
-    sine_wave = np.sin(2 * np.pi * f_hr * t - phase)
-    wave = sine_wave
-
-    wave = signal.resample(wave, val)
-    wave = np.concatenate((zer_array, wave),axis=0)
-
-    return wave
-
 def rr_gen(rr, samples):
     fs = samples  # Sampling frequency in Hz
     duration = 1  # Signal duration in seconds
@@ -251,7 +230,7 @@ def pulse_base(amp, samples, duty_cycle):
 
 def pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step):
 
-    duty_cycle = 0.1
+    duty_cycle = 0.5
 
     wave_a = pulse_base(max_amp, samples, duty_cycle)
 
@@ -291,7 +270,28 @@ def sine_gen_with_rr_base(amp, samples):
     
     return wave
 
+def sine_gen_with_rr_dc(amp, samples, duty_cycle):
 
+    f_hr = 1
+    duration = 1
+    sampling_rate = samples
+    phase = 0
+
+    val = int(duty_cycle*samples)
+    rem = samples - val
+    zer_array = np.zeros(rem)
+  
+    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
+    
+    sine_wave = np.sin(2 * np.pi * f_hr * t - phase)
+    wave = sine_wave
+
+    # wave = signal.resample(wave, val)
+    # wave = np.concatenate((zer_array, wave),axis=0)
+
+    wave = np.where(wave < 0, 0, wave)
+
+    return wave
 
 def sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step):
 
@@ -301,8 +301,8 @@ def sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step):
     duty_cycle = 0.05
 
     ## Select base sine wave - with or without Duty Cycle
-    wave = sine_gen_with_rr_base(max_val, samples)
-    # wave = sine_gen_with_rr_dc(max_val, samples, duty_cycle)
+    # wave = sine_gen_with_rr_base(max_val, samples)
+    wave = sine_gen_with_rr_dc(max_val, samples, duty_cycle)
 
     val = int(np.round(hr/rr))
     reps = int(np.round(rr/60*duration))

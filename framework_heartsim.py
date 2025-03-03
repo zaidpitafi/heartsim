@@ -48,7 +48,7 @@ def main(args):
     elif args.wave_type == 'scg':
         wave= scg_gen(max_amp,samples)
     elif args.wave_type == 'hat':
-        wave= mexhat_gen(max_amp,samples,duration,hr)
+        wave= mexhat_gen_with_rr(max_amp,samples,duration,hr)
     elif args.wave_type == 'sym4':
         wave= sym4_gen(max_amp,samples,duration,hr)
     elif args.wave_type == 'db12':
@@ -61,12 +61,13 @@ def main(args):
 
     try:
         while(k>0):
-            # if hr<60 and (max_amp-min_amp)<600:
-            #     rr_step = 0.1
+            if hr<50:
+                rr_step = 0.03
 
             #### Select Wave Here
-            # wave = mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
-            wave = pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
+            wave = mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
+            # wave = pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
+            # wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step)
 
             start_time = time.time()
             print('Start time:', start_time)
@@ -90,8 +91,9 @@ def main(args):
             simulated_data.append(list(wave)+[start_time]+[calc_hr]+[rr])
             time.sleep(ibi)  ##IBI
             k -=1
-            hr +=12
-            # rr +=4
+            # hr +=12
+            rr +=4
+            # rr_step += 0.08
             
     except KeyboardInterrupt:
         print('End')
@@ -105,15 +107,15 @@ if __name__== '__main__':
     parser.add_argument("--unit", type=str, help='BDot MAC address to Post Labels', default='12:02:12:02:12:02')
     parser.add_argument("--start", type=str, default=None, help='start time')
     parser.add_argument("--end", type=str, default=None, help='end time')        
-    parser.add_argument('--wave_type', type=str, default='pulse',
+    parser.add_argument('--wave_type', type=str, default='mexhat',
                         help='the input wave shape')       
-    parser.add_argument('--hr', type=int, default=42,
+    parser.add_argument('--hr', type=int, default=96,
                         help='the desired Heart Rate')
-    parser.add_argument('--rr', type=int, default=12, help='The desired Respiratory Rate')
-    parser.add_argument('--rr_step', type=float, default=0.1, help='rr envelope step')
+    parser.add_argument('--rr', type=int, default=8, help='The desired Respiratory Rate')
+    parser.add_argument('--rr_step', type=float, default=0.8, help='rr envelope step')
     parser.add_argument('--min_amp', type=int, default=0, 
                         help='the min strength of signal')                                
-    parser.add_argument('--max_amp', type=int, default=512, 
+    parser.add_argument('--max_amp', type=int, default=4095, 
                         help='the max strength of signal')
     parser.add_argument('--sampling_rate', type=int, default=410, 
                         help='the number of samples')
