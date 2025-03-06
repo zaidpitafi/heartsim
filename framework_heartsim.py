@@ -7,7 +7,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from datasim.ecg.ecg_simulate import *
-from utils import write_influx
+from utils import write_influx, write_mqtt
 from mqtt_to_influxdb import *
 from mqtt import *
 from pulse import *
@@ -56,18 +56,21 @@ def main(args):
 
     simulated_data = []
     init_time = int(time.time())
-
-    k = 10
+    hr_list = [40, 66, 80, 120, 160]
+    rr_list = [8, 16, 24, 32, 40]
+    k = 50
+    fs = 1
 
     try:
+        wave = sine_gen_with_rr_v4(min_amp, 4095, samples, 60, 126, 12, 0.15)
         while(k>0):
-            if hr<50:
-                rr_step = 0.03
+            # if hr>150:
+            #     rr_step = 0.05
 
             #### Select Wave Here
-            wave = mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
+            # wave = mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
             # wave = pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
-            # wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step)
+            wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step)
 
             start_time = time.time()
             print('Start time:', start_time)
@@ -79,6 +82,15 @@ def main(args):
                 time.sleep(delay)
             end_time = time.time()
             print('End time:', end_time)
+            
+            ## Write Labels for 10s, each label after 1s
+            hr_array = np.repeat(hr, 10)
+            rr_array = np.repeat(rr, 10)
+            write_mqtt(hr_array, rr_array, start_time, fs)
+
+
+            final_time = time.time()
+            print('End time:', final_time)
             total_time = (end_time - start_time)
             
             total_cycles = hr/60 * duration
@@ -91,9 +103,15 @@ def main(args):
             simulated_data.append(list(wave)+[start_time]+[calc_hr]+[rr])
             time.sleep(ibi)  ##IBI
             k -=1
+
             # hr +=12
-            rr +=4
+            # if k<5:
+            #     hr = hr_list[5-k]
+            #     rr = rr_list[5-k]
+            # rr +=4
             # rr_step += 0.08
+
+
             
     except KeyboardInterrupt:
         print('End')
@@ -111,16 +129,16 @@ if __name__== '__main__':
                         help='the input wave shape')       
     parser.add_argument('--hr', type=int, default=96,
                         help='the desired Heart Rate')
-    parser.add_argument('--rr', type=int, default=8, help='The desired Respiratory Rate')
-    parser.add_argument('--rr_step', type=float, default=0.8, help='rr envelope step')
+    parser.add_argument('--rr', type=int, default=24, help='The desired Respiratory Rate')
+    parser.add_argument('--rr_step', type=float, default=0.03, help='rr envelope step')
     parser.add_argument('--min_amp', type=int, default=0, 
                         help='the min strength of signal')                                
-    parser.add_argument('--max_amp', type=int, default=4095, 
+    parser.add_argument('--max_amp', type=int, default=512, 
                         help='the max strength of signal')
     parser.add_argument('--sampling_rate', type=int, default=410, 
                         help='the number of samples')
     parser.add_argument('--ibi_interval', type=float, default=0, help='inter beat interval')
-    parser.add_argument('--duration', type=int, default=30, help='duration in seconds')
+    parser.add_argument('--duration', type=int, default=10, help='duration in seconds')
 
     args = parser.parse_args()
     main(args)

@@ -922,3 +922,49 @@ def remove_outliers(data):
     filtered_data = [x for x in data if lower_bound <= x <= upper_bound]
     
     return filtered_data
+
+
+import struct
+import time
+import numpy as np
+import paho.mqtt.client as mqtt
+import threading
+
+def pack_beddot_data(mac_addr, timestamp, data_interval, data):
+    # First, convert the MAC address into byte sequence
+    mac_bytes = bytes.fromhex(mac_addr.replace(':', ''))
+    # Then, pack each data item sequentially
+    packed_data = struct.pack("!BBBBBB", *mac_bytes)
+    packed_data += struct.pack("H", len(data))  # data length
+    packed_data += struct.pack("L", timestamp)  # timestamp
+    packed_data += struct.pack("I", data_interval)  # data interval 
+
+
+   # pack measurement data(Blood Oxygen)
+    for item in data:
+        packed_data += struct.pack("i", item)
+
+
+    return packed_data
+
+
+def write_mqtt(hrdata, rrdata, timestamp, fs):
+    mac_addr="12:02:12:02:12:02"
+    timestamp = int(time.time() * 1000000)
+    hrdata = np.int32(hrdata)
+    rrdata = np.int32(rrdata)
+    Ts = int((1/fs) * 1000000)
+    packed_data_1 = pack_beddot_data(mac_addr, timestamp, Ts, hrdata) # 10000 equates to fs=1/0.01=100
+    packed_data_2 = pack_beddot_data(mac_addr, timestamp, Ts, rrdata)
+
+    client = mqtt.Client()
+    client.connect("sensorweb.us", 1883)
+    mqtt_thread = threading.Thread(target=lambda: client.loop_forever())
+    mqtt_thread.start()
+
+
+    client.publish("/UGA/120212021202/hrlabel", packed_data_1, qos=1)
+    client.publish("/UGA/120212021202/rrlabel", packed_data_2, qos=1)
+    print('Published')
+    return None
+
