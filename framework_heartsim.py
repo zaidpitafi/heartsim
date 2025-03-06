@@ -80,17 +80,18 @@ def main(args):
                 dac.raw_value = val
                 delay = delay_req - 0.00041     # inherent delay of DAC is subtracted, 0.00041 
                 time.sleep(delay)
+
             end_time = time.time()
-            print('End time:', end_time)
+            # print('End time:', end_time)
             
             ## Write Labels for 10s, each label after 1s
-            hr_array = np.repeat(hr, 10)
-            rr_array = np.repeat(rr, 10)
+            hr_array = np.repeat(hr, args.duration)
+            rr_array = np.repeat(rr, args.duration)
             write_mqtt(hr_array, rr_array, start_time, fs)
 
 
             final_time = time.time()
-            print('End time:', final_time)
+            print('Final time:', final_time)
             total_time = (end_time - start_time)
             
             total_cycles = hr/60 * duration
@@ -138,7 +139,7 @@ if __name__== '__main__':
     parser.add_argument('--sampling_rate', type=int, default=410, 
                         help='the number of samples')
     parser.add_argument('--ibi_interval', type=float, default=0, help='inter beat interval')
-    parser.add_argument('--duration', type=int, default=10, help='duration in seconds')
+    parser.add_argument('--duration', type=int, default=60, help='duration in seconds')
 
     args = parser.parse_args()
     main(args)

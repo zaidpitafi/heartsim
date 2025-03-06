@@ -950,7 +950,7 @@ def pack_beddot_data(mac_addr, timestamp, data_interval, data):
 
 def write_mqtt(hrdata, rrdata, timestamp, fs):
     mac_addr="12:02:12:02:12:02"
-    timestamp = int(time.time() * 1000000)
+    timestamp = int(timestamp * 1000000)
     hrdata = np.int32(hrdata)
     rrdata = np.int32(rrdata)
     Ts = int((1/fs) * 1000000)
