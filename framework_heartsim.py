@@ -69,8 +69,8 @@ def main(args):
 
             #### Select Wave Here
             # wave = mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
-            wave = pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
-            # wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step)
+            # wave = pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
+            wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step)
  
             start_time = time.time()
             print('Start time:', start_time)
@@ -128,13 +128,13 @@ if __name__== '__main__':
     parser.add_argument("--end", type=str, default=None, help='end time')        
     parser.add_argument('--wave_type', type=str, default='mexhat',
                         help='the input wave shape')       
-    parser.add_argument('--hr', type=int, default=160,
+    parser.add_argument('--hr', type=int, default=40,
                         help='the desired Heart Rate')
-    parser.add_argument('--rr', type=int, default=40, help='The desired Respiratory Rate')
-    parser.add_argument('--rr_step', type=float, default=0.04, help='rr envelope step')
+    parser.add_argument('--rr', type=int, default=8, help='The desired Respiratory Rate')
+    parser.add_argument('--rr_step', type=float, default=0.01, help='rr envelope step')
     parser.add_argument('--min_amp', type=int, default=0, 
                         help='the min strength of signal')                                
-    parser.add_argument('--max_amp', type=int, default=512, 
+    parser.add_argument('--max_amp', type=int, default=200, 
                         help='the max strength of signal')
     parser.add_argument('--sampling_rate', type=int, default=410, 
                         help='the number of samples')

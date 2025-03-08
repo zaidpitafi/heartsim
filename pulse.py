@@ -239,6 +239,7 @@ def pulse_gen_with_rr(min_val, max_val, samples, duration, hr, rr, rr_step):
     reps = int(np.round(rr/60*duration))
 
     ## For RR effect
+    if hr < 120: val = val-1
     scaling_factors = generate_increasing_amplitude_wave_array(val, rr_step)
     rsa = np.tile(wave_a, len(scaling_factors)) * np.repeat(scaling_factors, len(wave_a))
     wave_f = np.tile(rsa,reps)
@@ -303,7 +304,7 @@ def sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step):
     min_val = min_amp
     max_val = max_amp
 
-    duty_cycle = 0.05
+    duty_cycle = 0.75
 
     ## Select base sine wave - with or without Duty Cycle
     
@@ -315,7 +316,7 @@ def sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step):
     val = int(np.round(hr/rr))
     reps = int(np.round(rr/60*duration))
     if hr <140: val = val-1
-    scaling_factors = generate_wave_array(val, rr_step)
+    scaling_factors = generate_increasing_amplitude_wave_array(val, rr_step)
     rsa = np.tile(wave, len(scaling_factors)) * np.repeat(scaling_factors, len(wave))
     wave_f = np.tile(rsa,reps)
 
