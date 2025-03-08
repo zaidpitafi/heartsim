@@ -158,26 +158,30 @@ def epoch_to_datetime_est(epoch_time):
     return dt_est
     
 
-def generate_wave_array(i):
+def generate_wave_array(i,step_size):
     # Generate the increasing part (from 0.1 to i/2 with step 0.1)
-    step = 0.05
+    step = step_size
     half_length = int(i // 2)
     increasing_part = np.arange(step, (half_length + 1) * step, step)
     
     # Generate the decreasing part (reverse of the increasing part, excluding the last value)
-    # decreasing_part = increasing_part[-2::-1]  # Skip the last element to avoid repetition
-    decreasing_part = increasing_part[-2:]
+    decreasing_part = increasing_part[-2::-2]  # Skip the last element to avoid repetition
+    # decreasing_part = increasing_part[-2:]
     # Combine both parts
     wave_array = np.concatenate((increasing_part, decreasing_part))
     return wave_array
 
+
+#################################################
+
 def generate_increasing_amplitude_wave_array(i,step_size):
-    # Create an array starting from 1.1, increasing by 0.1 up to length i
+    # Create an array starting from 1.1, increasing by step up to length i
     step = step_size
     wave_array = np.arange(1, 1 + step * i, step)
     return wave_array
 
-#################################################
+
+
 def mexhat_gen_base(amp, samples, duration, hr):
     points = samples
     reps = int(duration*hr/60)
@@ -216,7 +220,7 @@ def pulse_base(min_val, max_val, samples, duration):
     # Parameters
     fs = samples  # Sampling frequency in Hz
     t = np.linspace(0, duration, fs, endpoint=False)  # 1 second duration
-    duty_cycle = 0.5  # 50% duty cycle
+    duty_cycle = 0.05  # 50% duty cycle
     f_hr = 1
     amp =1
     # Generate pulse waveform
@@ -234,22 +238,23 @@ def pulse_gen_with_rr(min_val, max_val, samples, duration, hr, rr, rr_step):
     val = int(np.round(hr/rr))
     reps = int(np.round(rr/60*duration))
 
+    ## For RR effect
     scaling_factors = generate_increasing_amplitude_wave_array(val, rr_step)
-    # if len(scaling_factors) > 1:
-    #     scaling_factors = scaling_factors[:-1]
-
     rsa = np.tile(wave_a, len(scaling_factors)) * np.repeat(scaling_factors, len(wave_a))
-    
     wave_f = np.tile(rsa,reps)
-    new_length = duration*samples
-    wave = np.interp(np.linspace(0, len(wave_f)-1, new_length), 
-                            np.arange(len(wave_f)), 
-                            wave_f)
 
+    # Without RR effect
+    # reps = int(hr)
+    # wave_f = np.tile(wave_a, reps)
+
+
+    new_length = duration*samples
+    wave = np.interp(np.linspace(0, len(wave_f)-1, new_length), np.arange(len(wave_f)), wave_f)
     
-    # wave_f = ((wave_f-np.min(wave_f))/(np.max(wave_f)-np.min(wave_f)) * amp)
+    # wave = -wave
     wave = min_val + ((wave - np.min(wave)) / (np.max(wave) - np.min(wave))) * (max_val - min_val)
-    wave = abs(wave_f)
+    
+    wave = abs(wave)
     return wave
 
 def sine_gen_with_rr_base(amp, samples):
@@ -298,7 +303,7 @@ def sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step):
     min_val = min_amp
     max_val = max_amp
 
-    duty_cycle = 0.95
+    duty_cycle = 0.05
 
     ## Select base sine wave - with or without Duty Cycle
     
@@ -309,13 +314,13 @@ def sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step):
 
     val = int(np.round(hr/rr))
     reps = int(np.round(rr/60*duration))
-    scaling_factors = generate_increasing_amplitude_wave_array(val, rr_step)
-    # if len(scaling_factors) > 1:
-    #     scaling_factors = scaling_factors[:-1]
+    if hr <140: val = val-1
+    scaling_factors = generate_wave_array(val, rr_step)
     rsa = np.tile(wave, len(scaling_factors)) * np.repeat(scaling_factors, len(wave))
     wave_f = np.tile(rsa,reps)
 
     ### For RR effect comment this
+
     # reps = int(hr)
     # wave_f = np.tile(wave, reps)
 
@@ -324,7 +329,9 @@ def sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step):
     wave = np.interp(np.linspace(0, len(wave_f)-1, new_length), np.arange(len(wave_f)), wave_f)
     
     ## Select Normalization
-    # wave = ((wave-np.min(wave))/(np.max(wave)-np.min(wave)) * amp)
+    
+    # wave = -wave
+
     wave = min_val + ((wave - np.min(wave)) / (np.max(wave) - np.min(wave))) * (max_val - min_val)
     
     wave = abs(wave)

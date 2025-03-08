@@ -55,7 +55,7 @@ def main(args):
         wave= db12_gen(max_amp,samples,duration,hr)
 
     simulated_data = []
-    init_time = int(time.time())
+
     hr_list = [40, 66, 80, 120, 160]
     rr_list = [8, 16, 24, 32, 40]
     k = 50
@@ -69,16 +69,16 @@ def main(args):
 
             #### Select Wave Here
             # wave = mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
-            # wave = pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
-            wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step)
-
+            wave = pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
+            # wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step)
+ 
             start_time = time.time()
             print('Start time:', start_time)
             for i in range(0,len(wave)-1):
 
                 val = int(wave[i])
                 dac.raw_value = val
-                delay = delay_req - 0.00041     # inherent delay of DAC is subtracted, 0.00041 
+                delay = delay_req - 0.00041     # inherent delay of DAC is subtracted, 0.00041  
                 time.sleep(delay)
 
             end_time = time.time()
@@ -128,10 +128,10 @@ if __name__== '__main__':
     parser.add_argument("--end", type=str, default=None, help='end time')        
     parser.add_argument('--wave_type', type=str, default='mexhat',
                         help='the input wave shape')       
-    parser.add_argument('--hr', type=int, default=96,
+    parser.add_argument('--hr', type=int, default=160,
                         help='the desired Heart Rate')
-    parser.add_argument('--rr', type=int, default=24, help='The desired Respiratory Rate')
-    parser.add_argument('--rr_step', type=float, default=0.03, help='rr envelope step')
+    parser.add_argument('--rr', type=int, default=40, help='The desired Respiratory Rate')
+    parser.add_argument('--rr_step', type=float, default=0.04, help='rr envelope step')
     parser.add_argument('--min_amp', type=int, default=0, 
                         help='the min strength of signal')                                
     parser.add_argument('--max_amp', type=int, default=512, 
