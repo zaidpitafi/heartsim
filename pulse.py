@@ -181,7 +181,6 @@ def generate_increasing_amplitude_wave_array(i,step_size):
     return wave_array
 
 
-
 def mexhat_gen_base(amp, samples, duration, hr):
     points = samples
     reps = int(duration*hr/60)
@@ -216,11 +215,21 @@ def mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step):
 
     return wave
 
+
+
+
+
+
+################################
+#####################
+################
+
+
 def pulse_base(min_val, max_val, samples, duration):
     # Parameters
     fs = samples  # Sampling frequency in Hz
     t = np.linspace(0, duration, fs, endpoint=False)  # 1 second duration
-    duty_cycle = 0.05  # 50% duty cycle
+    duty_cycle = 0.75  # 50% duty cycle
     f_hr = 1
     amp =1
     # Generate pulse waveform

@@ -1,15 +1,7 @@
-import numpy as np
-import pandas as pd
-import neurokit2 as nk
 import time
-from smbus2 import SMBus
-import math
 import numpy as np
 import matplotlib.pyplot as plt
-from datasim.ecg.ecg_simulate import *
-from utils import write_influx, write_mqtt
-from mqtt_to_influxdb import *
-from mqtt import *
+from utils import write_mqtt
 from pulse import *
 import argparse
 import busio
@@ -60,6 +52,7 @@ def main(args):
     rr_list = [8, 16, 24, 32, 40]
     k = 50
     fs = 1
+    delay = 0
 
     try:
         wave = sine_gen_with_rr_v4(min_amp, 4095, samples, 60, 126, 12, 0.15)
@@ -68,7 +61,6 @@ def main(args):
             #     rr_step = 0.05
 
             #### Select Wave Here
-            # wave = mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
             # wave = pulse_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step)
             wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duration, hr, rr, rr_step)
  
@@ -77,8 +69,12 @@ def main(args):
             for i in range(0,len(wave)-1):
 
                 val = int(wave[i])
+                
+                # print(val)
                 dac.raw_value = val
-                delay = delay_req - 0.00041     # inherent delay of DAC is subtracted, 0.00041  
+                    # inherent delay of DAC is subtracted, 0.00041  
+                if samples <=500:
+                    delay = delay_req - 0.00041 
                 time.sleep(delay)
 
             end_time = time.time()
@@ -128,13 +124,13 @@ if __name__== '__main__':
     parser.add_argument("--end", type=str, default=None, help='end time')        
     parser.add_argument('--wave_type', type=str, default='mexhat',
                         help='the input wave shape')       
-    parser.add_argument('--hr', type=int, default=40,
+    parser.add_argument('--hr', type=int, default=64,
                         help='the desired Heart Rate')
-    parser.add_argument('--rr', type=int, default=8, help='The desired Respiratory Rate')
-    parser.add_argument('--rr_step', type=float, default=0.01, help='rr envelope step')
+    parser.add_argument('--rr', type=int, default=16, help='The desired Respiratory Rate')
+    parser.add_argument('--rr_step', type=float, default=0.02, help='rr envelope step')
     parser.add_argument('--min_amp', type=int, default=0, 
                         help='the min strength of signal')                                
-    parser.add_argument('--max_amp', type=int, default=200, 
+    parser.add_argument('--max_amp', type=int, default=256, 
                         help='the max strength of signal')
     parser.add_argument('--sampling_rate', type=int, default=410, 
                         help='the number of samples')
