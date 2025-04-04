@@ -21,9 +21,14 @@
 
 ### Example Usage
 `
-python3 framework_simulator.py 
+python3 framework_simulator_continous.py 
 `
 
-- The frequency of sine wave  is calculated by = 1/(sampling rate)
-- The Heart Rate is found by multiplying frequency by 60 
+## Usage
+
+- To Run the simulator code in any option, use the framework_heartsim_flexible.py
+
+### Example Usage
+`
+python3 framework_simulator_continous_flexible.py --hr 120 --rr 28
 
