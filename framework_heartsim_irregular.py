@@ -7,25 +7,15 @@ import board
 import adafruit_mcp4725 as a
 import time
 import paho.mqtt.client as mqtt
-from utils import pulse_gen_with_rr, sine_gen_with_rr_v4, get_mac, write_mqtt
+from utils import pulse_gen_with_rr_irr, sine_gen_with_rr_irr
 
-def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, duration=180, samples=410):   
+
+def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, duration=180, samples=410):
     freq = hr/60
-    samples = args.sampling_rate  ## number of points from DAC 
-    delay_req = 1/(samples) ## 2 to avoid double counting
-    min_amp = args.min_amp  ### Strength of the Signal
-    max_amp = args.max_amp
-    rr_step = args.rr_step
-
-    ibi = args.ibi_interval
-    rr = args.rr
+    delay_req = 1/(samples)
 
     i2c = busio.I2C(board.SCL, board.SDA)
     dac = a.MCP4725(i2c, address=0x60)
-
-    simulated_data = []
-
-    fs = 1
 
     try:
         while(minute>0):
@@ -33,23 +23,23 @@ def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, durat
                 wave = pulse_gen_with_rr(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)
             elif waveform == "sine":
                 wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)
- 
+            
             start_time = time.time()
             print('Start time:', start_time)
-
             for i in range(0,len(wave)-1):
                 val = int(wave[i])
                 dac.raw_value = val
+                # delay = delay_req - 0.00041 - 0.00025   
                 delay = delay_req - 0.00041 - 0.00025 - 0.000035
                 time.sleep(delay)
-
+ 
             end_time = time.time()
             # print('End time:', end_time)
             
             ## Write Labels for 10s, each label after 1s
-            hr_array = np.repeat(hr, args.duration)
-            rr_array = np.repeat(rr, args.duration)
-            write_mqtt(hr_array, rr_array, start_time, 1)
+            hr_array = np.repeat(hr, duration)
+            rr_array = np.repeat(rr, duration)
+            # write_mqtt(hr_array, rr_array, start_time, 1)
 
             final_time = time.time()
             print('Final time:', final_time)
@@ -61,7 +51,6 @@ def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, durat
             calc_hr = 60 * frequ
             print(f"Calculated HR: {calc_hr:.2f} bpm")
             print('hr:', hr, "rr:", rr)
-            
             minute -=1
             
     except KeyboardInterrupt:
@@ -82,9 +71,8 @@ if __name__== '__main__':
     parser.add_argument('--minute', type=int, default=3, help='Length of Working (Unit: min), default=3')
     args = parser.parse_args()
 
-    coeff = 0.67
     if args.option == 1:
-        hr, rr, rr_step = 40, 8, 0.02
+        hr, rr, rr_step = 40, 8, 0.01
         max_amp, min_amp = 200, 0
         duty_circle = 0.5
         waveform = 'sine'
@@ -108,7 +96,5 @@ if __name__== '__main__':
         max_amp, min_amp =  512, 0
         duty_circle = 0.05
         waveform = 'pulse'  
-    
-    print(get_mac())
-    
+        
     main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, args.minute)
