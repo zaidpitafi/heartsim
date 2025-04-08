@@ -77,7 +77,7 @@ if __name__== '__main__':
     parser.add_argument('--minute', type=int, default=3, help='Length of Working (Unit: min), default=3')
     parser.add_argument('--hr', type=int, default=40, help='HR to enter')
     parser.add_argument('--rr', type=int, default=8, help='RR to enter')
-    parser.add_argument('--rr_step', type=int, default=0.02, help='Resp Effect')
+    parser.add_argument('--rr_step', type=float, default=0.02, help='Resp Effect')
     parser.add_argument('--max_amp', type=int, default=200, help='Amplitude')
     parser.add_argument('--duty_circle', type=float, default=0.5, help='Duty Cycle of Wave (0 to 1)')
     parser.add_argument('--waveform', type=str, default='sine', help='Sine for HR < 140, pulse for >140')
