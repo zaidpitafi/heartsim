@@ -17,18 +17,18 @@
 
 ## Usage
 
-- To Run the simulator code in 5 options testing mode, use the framework_heartsim_continous.py file
+- To Run the simulator use the framework_heartsim_continous.py file and specify option.
+- Option 0 is for arbitrary HR and RR combination, in this case specify HR and RR
+- Option 1 to 5 are for the standard HR and RR combinations
 
 ### Example Usage
+
+- For Option 0
 `
-python3 framework_simulator_continous.py 
+python3 framework_simulator_continous.py --option 0 --hr xx --rr yy
 `
 
-## Usage
-
-- To Run the simulator code in any option, use the framework_heartsim_flexible.py
-
-### Example Usage
+- For Options 1-5
 `
-python3 framework_simulator_continous_flexible.py --hr 120 --rr 28
+python3 framework_simulator_continous.py --option x
 `
