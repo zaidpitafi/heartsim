@@ -24,11 +24,18 @@
 ### Example Usage
 
 - For Option 0
+
+You can specify any combination of heart rate (HR) and respiration rate (RR). Example: 
+
 `
-python3 framework_simulator_continous.py --option 0 --hr xx --rr yy
+python3 heartsim.py --option 0 --hr 96 --rr 16
 `
 
+
 - For Options 1-5
+
+You can choose specific HR and RR combination by using different options. Example: 
+
 `
-python3 framework_simulator_continous.py --option x
+python3 heartsim.py --option 1
 `
