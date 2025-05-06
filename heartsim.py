@@ -7,15 +7,10 @@ import board
 import adafruit_mcp4725 as a
 import time
 import paho.mqtt.client as mqtt
-from utils import pulse_gen_with_rr, sine_gen_with_rr_v4, get_mac, write_mqtt
+from utils import pulse_gen_with_rr, sine_gen_with_rr_v4, get_mac, write_mqtt, db12_gen
 
 def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, duration=60, samples=410):   
-    samples = args.sampling_rate  ## number of points from DAC 
     delay_req = 1/(samples) ## 2 to avoid double counting
-    min_amp = args.min_amp  ### Strength of the Signal
-    max_amp = args.max_amp
-    rr_step = args.rr_step
-    rr = args.rr
 
     i2c = busio.I2C(board.SCL, board.SDA)
     dac = a.MCP4725(i2c, address=0x60)
@@ -28,6 +23,8 @@ def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, durat
                 wave = pulse_gen_with_rr(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)
             elif waveform == "sine":
                 wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)
+            elif waveform == "db":
+                wave = db12_gen(min_amp,max_amp, samples, duration, hr)
  
             start_time = time.time()
             print('Start time:', start_time)
@@ -42,9 +39,9 @@ def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, durat
             # print('End time:', end_time)
             
             ## Write Labels for 10s, each label after 1s
-            hr_array = np.repeat(hr, args.duration)
-            rr_array = np.repeat(rr, args.duration)
-            write_mqtt(hr_array, rr_array, start_time, 1)
+            hr_array = np.repeat(hr, duration)
+            rr_array = np.repeat(rr, duration)
+            # write_mqtt(hr_array, rr_array, start_time, 1)
 
             final_time = time.time()
             print('Final time:', final_time)

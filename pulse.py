@@ -45,7 +45,11 @@ def sym4_gen(amp,samples, duration, hr):
     phi = abs(phi)
     return phi
 
-def db12_gen(amp,samples, duration, hr):
+def db12_gen(min_amp,max_amp, samples, duration, hr):
+    min_val = min_amp
+    max_val = max_amp
+
+
     reps = int(duration*hr/60) 
     max_amp = 4094
     wavelet = pywt.Wavelet('db12')
@@ -103,24 +107,6 @@ def sine_gen_with_rr (amp, samples, duration, hr, rr):
     hr_wave = hr_amp + (hr_amp * np.sin(2 * np.pi * freq_hr * t))
     
     sine_wave = rr_wave + hr_wave
-    return sine_wave
-
-
-def rr_gen_ming(in_sig, respiratory_rate):
-    num_points = int(in_sig.shape[0])
-    x_space = np.linspace(0,1,num_points)
-    seg_fre = respiratory_rate / (60/1)
-    seg_amp = max(in_sig)*0.1
-    rr_component = seg_amp*np.sin(2*np.pi * seg_fre * x_space)
-    in_sig += rr_component
-
-    return in_sig
-
-def sine_gen_old(amp, samples, freq):
-    sine_wave=[]
-    for i in range(0,samples):
-        val = amp + int(amp * (math.sin(2 * math.pi * i/4095)))
-        sine_wave.append(val)    
     return sine_wave
 
 
