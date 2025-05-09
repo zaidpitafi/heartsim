@@ -7,7 +7,7 @@ import board
 import adafruit_mcp4725 as a
 import time
 import paho.mqtt.client as mqtt
-from utils import pulse_gen_with_rr, sine_gen_with_rr_v4, get_mac, write_mqtt, db12_gen, sym4_gen
+from utils import pulse_gen_with_rr, sine_gen_with_rr_v4, get_mac, write_mqtt, db12_gen, sym4_gen, sine_gen_with_rr_irr_v2
 
 def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, duration=60, samples=410):   
     delay_req = 1/(samples) ## 2 to avoid double counting
@@ -22,7 +22,8 @@ def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, durat
         if waveform == "pulse":
             wave = pulse_gen_with_rr(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)
         elif waveform == "sine":
-            wave = sine_gen_with_rr_v4(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)
+            wave = sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)
+           
         elif waveform == "db":
             wave = db12_gen(min_amp,max_amp, samples, duration, hr)
         elif waveform == "sym":
@@ -78,7 +79,7 @@ if __name__== '__main__':
     parser.add_argument('--rr_step', type=float, default=0.02, help='Resp Effect')
     parser.add_argument('--max_amp', type=int, default=200, help='Amplitude')
     parser.add_argument('--duty_circle', type=float, default=0.5, help='Duty Cycle of Wave (0 to 1)')
-    parser.add_argument('--waveform', type=str, default='pulse', help='Sine for HR < 140, pulse for >140')
+    parser.add_argument('--waveform', type=str, default='sine', help='Sine for HR < 140, pulse for >140')
     args = parser.parse_args()
 
     if args.option == 0:

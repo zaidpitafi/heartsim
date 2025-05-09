@@ -190,16 +190,14 @@ def sine_gen_with_rr_v4(min_amp, max_amp, samples, duty_circle, duration, hr, rr
 
 
 
-def sine_gen_with_rr_irr(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step, hrv):
+def sine_gen_with_rr_irr(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step, hrv=10):
     hr_num = int(duration * hr / 60) + 1
     rr_num = int(duration * rr / 60) + 1
     
-
     hr_waves = [sine_wave_base(samples, duty_circle, hrv) for _ in range(hr_num)]
     hr_waves_len = [len(wave) for wave in hr_waves]
     hr_waves = np.concatenate(hr_waves)
-
-    
+ 
     if hr <140: val = val-1
     scaling_factors = generate_increasing_amplitude_wave_array(val, rr_step)
     rsa = np.tile(wave, len(scaling_factors)) * np.repeat(scaling_factors, len(wave))
