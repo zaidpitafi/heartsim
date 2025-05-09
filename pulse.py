@@ -1,18 +1,10 @@
 import numpy as np
-import pandas as pd
-import neurokit2 as nk
 import time
 from smbus2 import SMBus
 # import adafruit_mcp4725 as a
 import math
 # import board, busio
 import numpy as np
-import matplotlib.pyplot as plt
-from datasim.ecg.ecg_simulate import *
-from datasim.scg.scg_simulate import *
-#from utils import write_influx
-# from mqtt_to_influxdb import *
-from mqtt import *
 from scipy import signal
 import pywt
 import datetime
@@ -32,13 +24,15 @@ def sine_gen_with_rr_v2(amp, samples, duration, hr, rr):
     
     return wave
 
-def sym4_gen(amp,samples, duration, hr):
+def sym4_gen(min_amp,max_amp, samples, duration, hr):
+    min_val = min_amp
+    max_val = max_amp
     reps = int(duration*hr/60) 
 
     wavelet = pywt.Wavelet('sym4')
     phi, psi, x = wavelet.wavefun(level=3)
     
-    phi = ((phi-np.min(phi))/(np.max(phi)-np.min(phi)) * amp)
+    phi = ((phi-np.min(phi))/(np.max(phi)-np.min(phi)) * max_amp)
     
     phi = np.tile(phi,reps)
     phi = signal.resample(phi, samples*duration)
@@ -51,11 +45,10 @@ def db12_gen(min_amp,max_amp, samples, duration, hr):
 
 
     reps = int(duration*hr/60) 
-    max_amp = 4094
     wavelet = pywt.Wavelet('db12')
     phi, psi, x = wavelet.wavefun(level=3)
     
-    phi = ((phi-np.min(phi))/(np.max(phi)-np.min(phi)) * amp)
+    phi = ((phi-np.min(phi))/(np.max(phi)-np.min(phi)) * max_amp)
     
     phi = np.tile(phi,reps)
     phi = signal.resample(phi, samples*duration)
@@ -63,18 +56,6 @@ def db12_gen(min_amp,max_amp, samples, duration, hr):
     return phi
 
 
-
-def scg_gen(amp, step_size):
-    scg = scg_simulate(length=step_size, duration=1)
-    scg_n = amp + int((scg-np.min(scg))/(np.max(scg)-np.min(scg)) * amp)
-    scg_n = np.tile(scg_n,10)
-    return scg_n
-    
-def ecg_gen(amp, step_size):
-    ecg = ecg_simulate(length=step_size, heart_rate = 80)
-    ecg_n = amp + int((ecg-np.min(ecg))/(np.max(ecg)-np.min(ecg)) * amp)
-    ecg_n = np.tile(ecg_n,10)
-    return ecg_n
 
 def sine_gen (amp, samples, hb, freq):
     frequency = freq       # Frequency in Hz
