@@ -13,6 +13,7 @@ import threading
 from scipy import signal
 import netifaces
 import random
+import pywt
 
 """
 ************************ Used for Label Upload ************************
@@ -244,3 +245,70 @@ def generate_rr_wave(rr, samples, duration):
     rr_wave = signal.sawtooth(2 * np.pi * (rr/60) * t) 
     rr_wave = apply_amp(rr_wave, 1, 0.9)
     return rr_wave
+    
+    
+def sym4_gen(min_amp,max_amp, samples, duration, hr):
+    min_val = min_amp
+    max_val = max_amp
+    reps = int(duration*hr/60) 
+
+    wavelet = pywt.Wavelet('sym4')
+    phi, psi, x = wavelet.wavefun(level=3)
+    
+    phi = ((phi-np.min(phi))/(np.max(phi)-np.min(phi)) * max_amp)
+    
+    phi = np.tile(phi,reps)
+    phi = signal.resample(phi, samples*duration)
+    phi = abs(phi)
+    return phi
+
+def db12_gen(min_amp,max_amp, samples, duration, hr):
+    min_val = min_amp
+    max_val = max_amp
+
+
+    reps = int(duration*hr/60) 
+    wavelet = pywt.Wavelet('db12')
+    phi, psi, x = wavelet.wavefun(level=3)
+    
+    phi = ((phi-np.min(phi))/(np.max(phi)-np.min(phi)) * max_amp)
+    
+    phi = np.tile(phi,reps)
+    phi = signal.resample(phi, samples*duration)
+    phi = abs(phi)
+    return phi
+    
+
+def mexhat_gen_base(amp, samples, duration, hr):
+    points = samples
+    reps = int(duration*hr/60)
+    a = 4 ##width default is 4
+    
+    vec2 = signal.ricker(100, a) 
+    vec2 = ((vec2-np.min(vec2))/(np.max(vec2)-np.min(vec2)) * amp)
+    vec2 = np.tile(vec2,reps)
+    vec2 = signal.resample(vec2, samples*duration)
+    vec2 = abs(vec2)
+    return vec2
+
+
+def mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step):
+
+    wave = mexhat_gen_base(max_amp, samples, 1, 60)
+
+    val = int(hr/rr)
+    reps = int(rr/60*duration)
+    scaling_factors = generate_increasing_amplitude_wave_array(val, rr_step)
+
+    rsa = np.tile(wave, len(scaling_factors)) * np.repeat(scaling_factors, len(wave))
+
+    # rsa_norm = ((rsa-np.min(rsa))/(np.max(rsa)-np.min(rsa)) * max_amp)
+
+    wave_f = np.tile(rsa,reps)
+
+    wave = signal.resample(wave_f,duration*samples)
+
+    wave = min_amp + ((wave - np.min(wave)) / (np.max(wave) - np.min(wave))) * (max_amp - min_amp)
+    wave = abs(wave)
+
+    return wave
