@@ -17,6 +17,16 @@
 
 ## Usage
 
+### To Install Required Python Packages
+
+- If you reinstall operating system, then run following command to install all required packages before running the code.
+
+`
+sudo python3 -m pip install --break-system-packages -r requirements.txt
+`
+
+### To Run Simulator Code
+
 - To Run the simulator use the framework_heartsim_continous.py file and specify option.
 - Option 0 is for arbitrary HR and RR combination, in this case specify HR and RR
 - Option 1 to 5 are for the standard HR and RR combinations
@@ -39,12 +49,4 @@ You can choose specific HR and RR combination by using different options. Exampl
 `
 
 python3 heartsim.py --option 1
-`
-
-### To Install Required Python Packages
-
-- If you reinstall operating system, then run following command to install all required packages before running the code.
-
-`
-sudo python3 -m pip install --break-system-packages -r requirements.txt
 `
