@@ -117,7 +117,7 @@ def pulse_gen_with_rr(min_val, max_val, samples, duty_circle, duration, hr, rr, 
 
 
 
-def sine_wave_base(samples, duty_cycle, hrv=None):
+def sine_wave_base(samples, duty_cycle, hrv=0.4):
     f_hr = 0.5 / duty_cycle
     t = np.linspace(0, 1, samples, endpoint=False)
     sine_wave = np.sin(2 * np.pi * f_hr * t)[:int(samples * duty_cycle)]

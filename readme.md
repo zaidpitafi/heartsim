@@ -25,6 +25,9 @@
 sudo python3 -m pip install --break-system-packages -r requirements.txt
 `
 
+- After installing the packages, enable the I2C interface. Run sudo raspi-config. Then go to Interfacing Option, select I2C and enable it. Reboot with sudo reboot. After rebooting, run sudo i2cdetect -y 1, you should see some devices in the adress table. 
+
+
 ### To Run Simulator Code
 
 - To Run the simulator use the framework_heartsim_continous.py file and specify option.
