@@ -19,14 +19,18 @@
 
 ### To Install Required Python Packages
 
-- If you reinstall operating system, then run following command to install all required packages before running the code.
+<!-- - If you reinstall operating system, then run following command to install all required packages before running the code.
 
 `
 sudo python3 -m pip install --break-system-packages -r requirements.txt
 `
 
-- After installing the packages, enable the I2C interface. Run sudo raspi-config. Then go to Interfacing Option, select I2C and enable it. Reboot with sudo reboot. After rebooting, run sudo i2cdetect -y 1, you should see some devices in the adress table. 
+- After installing the packages, enable the I2C interface. Run sudo raspi-config. Then go to Interfacing Option, select I2C and enable it. Reboot with sudo reboot. After rebooting, run sudo i2cdetect -y 1, you should see some devices in the adress table.  -->
+`
+sudo chomd +x install.sh
 
+./install.sh
+`
 
 ### To Run Simulator Code
 

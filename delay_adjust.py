@@ -9,7 +9,6 @@ import adafruit_mcp4725 as a
 import struct
 import time
 import threading
-from scipy import signal
 from utils import pulse_gen_with_rr, sine_gen_with_rr_v4 
 
 def main(hr, rr, rr_step, max_amp, min_amp, waveform, minute, duration=60, samples=410):
