@@ -47,6 +47,5 @@ python3 heartsim.py --option 0 --hr 96 --rr 16
 You can choose specific HR and RR combination by using different options. Example: 
 
 `
-
 python3 heartsim.py --option 1
 `
