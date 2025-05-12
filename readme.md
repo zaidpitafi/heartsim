@@ -37,5 +37,14 @@ python3 heartsim.py --option 0 --hr 96 --rr 16
 You can choose specific HR and RR combination by using different options. Example: 
 
 `
+
 python3 heartsim.py --option 1
+`
+
+### To Install Required Python Packages
+
+- If you reinstall operating system, then run following command to install all required packages before running the code.
+
+`
+sudo python3 -m pip install --break-system-packages -r requirements.txt
 `
