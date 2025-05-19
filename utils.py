@@ -142,7 +142,7 @@ def generate_increasing_amplitude_wave_array(i,step_size):
     wave_array = np.arange(1, 1 + step * i, step)
     return wave_array
 
-def pulse_base(min_val, max_val, samples, duty_cycle, duration):
+def pulse_base(samples, duty_cycle):
     f_hr = 0.5 / duty_cycle  # Sampling frequency in Hz
     t = np.linspace(0, 1, samples, endpoint=False)
 
