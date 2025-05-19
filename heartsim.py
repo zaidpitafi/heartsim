@@ -112,5 +112,8 @@ if __name__== '__main__':
         max_amp, min_amp =  512, 0
         duty_circle = 0.05
         waveform = 'pulse'
-    
+
+    # with open('saved_data/logs.txt', 'a') as f:
+    #     f.write(f'start_time: {time.time()}, duration: {args.minute}, hr: {hr}, rr: {rr}, waveform: {waveform}, dc: {duty_circle}, max_amp: {args.max_amp} \n')
+
     main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, args.minute)
