@@ -237,7 +237,7 @@ def chirp_wave(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step
         wave_f = wave_f.tolist()
         wave.append(wave_f)
         hr += 10
-
+    print(wave[:100])
     return wave
 
 
