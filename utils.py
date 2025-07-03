@@ -237,6 +237,8 @@ def chirp_wave(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step
         wave.append(wave_f)
         hr += 10
 
+    wave = np.array(wave)
+
     return wave
 
 
