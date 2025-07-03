@@ -231,10 +231,10 @@ def sine_gen_with_rr_v4(min_amp, max_amp, samples, duty_circle, duration, hr, rr
     return wave
 
 def chirp_wave(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step):
-
+    wave = []
     for i in range(21):
-        wave = sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, 10, 40, 16, rr_step)
-        print(i)
+        wave_f = sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, 10, 40, 16, rr_step)
+        wave.append(wave_f)
         hr += 10
 
     return wave
