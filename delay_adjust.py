@@ -28,7 +28,7 @@ def main(hr, rr, rr_step, max_amp, min_amp, waveform, minute, duration=60, sampl
             for i in range(0,len(wave)-1):
                 val = int(wave[i])
                 dac.raw_value = val
-                delay = delay_req - (0.00041 + 0.00025 + 0.000035)  
+                delay = delay_req - (0.00041 + 0.00025 + 0.000035 - 0.0001)  
                 time.sleep(delay)
 
             end_time = time.time()

@@ -19,6 +19,7 @@ def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, durat
     simulated_data = []
     
     try:
+        print(f'rr: {rr}')
         if waveform == "pulse":
             wave = pulse_gen_with_rr(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)
         elif waveform == "sine":
@@ -35,7 +36,7 @@ def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, durat
         for i in range(0,len(wave)-1):
             val = int(wave[i])
             dac.raw_value = val
-            delay = delay_req - 0.00041 - 0.00025 - 0.000035
+            delay = delay_req - 0.00041 - 0.00025 - 0.000035 + 0.0001
             time.sleep(delay)
 
         end_time = time.time()
@@ -77,7 +78,7 @@ if __name__== '__main__':
     parser.add_argument('--hr', type=int, default=64, help='HR to enter')
     parser.add_argument('--rr', type=int, default=16, help='RR to enter')
     parser.add_argument('--rr_step', type=float, default=0.02, help='Resp Effect')
-    parser.add_argument('--max_amp', type=int, default=200, help='Amplitude')
+    parser.add_argument('--max_amp', type=int, default=256, help='Amplitude')
     parser.add_argument('--duty_circle', type=float, default=0.5, help='Duty Cycle of Wave (0 to 1)')
     parser.add_argument('--waveform', type=str, default='sine', help='Sine for HR < 140, pulse for >140')
     args = parser.parse_args()
@@ -113,7 +114,7 @@ if __name__== '__main__':
         duty_circle = 0.05
         waveform = 'pulse'
 
-    # with open('saved_data/logs.txt', 'a') as f:
-    #     f.write(f'start_time: {time.time()}, duration: {args.minute}, hr: {hr}, rr: {rr}, waveform: {waveform}, dc: {duty_circle}, max_amp: {args.max_amp} \n')
+    with open('saved_data/logs.txt', 'a') as f:
+        f.write(f'start_time: {time.time()}, duration: {args.minute}, hr: {hr}, rr: {rr}, waveform: {waveform}, dc: {duty_circle}, max_amp: {args.max_amp} \n')
 
     main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, args.minute)

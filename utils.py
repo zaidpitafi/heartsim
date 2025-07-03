@@ -165,19 +165,19 @@ def pulse_gen_with_rr(min_val, max_val, samples, duty_circle, duration, hr, rr, 
     hr_waves = signal.resample(hr_waves, samples*duration)
     print(f'len hr waves: {len(hr_waves)}')
     print(f'desried hr waves: {samples * duration}, actual hr waves: {len(hr_waves)}')
-    
-    rr_waves = generate_rr_wave(rr, samples, duration)
-    print(f'len rr waves: {len(rr_waves)}')
-    rr_waves_discrete = np.zeros_like(rr_waves)
+    if rr != 0: 
+        rr_waves = generate_rr_wave(rr, samples, duration)
+        print(f'len rr waves: {len(rr_waves)}')
+        rr_waves_discrete = np.zeros_like(rr_waves)
 
-    begin = 0
-    end = hr_waves_len[0]
-    for hr_wave_len in hr_waves_len:
-        end = begin + hr_wave_len
-        rr_waves_discrete[begin:end] = rr_waves[(2*begin + end) // 3]
-        begin = end
+        begin = 0
+        end = hr_waves_len[0]
+        for hr_wave_len in hr_waves_len:
+            end = begin + hr_wave_len
+            rr_waves_discrete[begin:end] = rr_waves[(2*begin + end) // 3]
+            begin = end
 
-    hr_waves = hr_waves * rr_waves_discrete
+        hr_waves = hr_waves * rr_waves_discrete
     # hr_waves = np.interp(np.linspace(0, len(hr_waves), samples * duration), np.arange(len(hr_waves)), hr_waves)
     wave = apply_amp(hr_waves, max_val, min_val)
 
@@ -261,20 +261,20 @@ def sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, duration, hr
     hr_waves = signal.resample(hr_waves, samples*duration)
     print(f'len hr waves: {len(hr_waves)}')
     print(f'desried hr waves: {samples * duration}, actual hr waves: {len(hr_waves)}')
+    if rr != 0:
+        rr_waves = generate_rr_wave(rr, samples, duration)
+        print(f'len rr waves: {len(rr_waves)}')
+        rr_waves_discrete = np.zeros_like(rr_waves)
 
-    rr_waves = generate_rr_wave(rr, samples, duration)
-    print(f'len rr waves: {len(rr_waves)}')
-    rr_waves_discrete = np.zeros_like(rr_waves)
+        begin = 0
+        end = hr_waves_len[0]
+        for hr_wave_len in hr_waves_len:
+            end = begin + hr_wave_len
+            rr_waves_discrete[begin:end] = rr_waves[(2*begin + end) // 3]
+            begin = end
 
-    begin = 0
-    end = hr_waves_len[0]
-    for hr_wave_len in hr_waves_len:
-        end = begin + hr_wave_len
-        rr_waves_discrete[begin:end] = rr_waves[(2*begin + end) // 3]
-        begin = end
-
-    hr_waves = hr_waves * rr_waves_discrete
-    # hr_waves = np.interp(np.linspace(0, len(hr_waves), samples * duration), np.arange(len(hr_waves)), hr_waves)
+        hr_waves = hr_waves * rr_waves_discrete
+        # hr_waves = np.interp(np.linspace(0, len(hr_waves), samples * duration), np.arange(len(hr_waves)), hr_waves)
     wave = apply_amp(hr_waves, max_amp, min_amp)
     return wave
 
@@ -282,6 +282,6 @@ def sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, duration, hr
 def generate_rr_wave(rr, samples, duration):
     t = np.linspace(0, duration, samples * duration, endpoint=False)
     rr_wave = signal.sawtooth(2 * np.pi * (rr/60) * t) 
-    rr_wave = apply_amp(rr_wave, 1, 0.95)
+    rr_wave = apply_amp(rr_wave, 1, 0.98)
     return rr_wave
     
