@@ -7,7 +7,7 @@ import board
 import adafruit_mcp4725 as a
 import time
 import paho.mqtt.client as mqtt
-from utils import pulse_gen_with_rr, sine_gen_with_rr_v4, get_mac, write_mqtt, db12_gen, sym4_gen, sine_gen_with_rr_irr_v2
+from utils import pulse_gen_with_rr, sine_gen_with_rr_v4, get_mac, write_mqtt, db12_gen, sym4_gen, sine_gen_with_rr_irr_v2, chirp_wave
 
 def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, duration=60, samples=410):   
     delay_req = 1/(samples) ## 2 to avoid double counting
@@ -76,7 +76,7 @@ if __name__== '__main__':
     parser = argparse.ArgumentParser(description='Heartbeat Simulator', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--option', type=int, default=1, help='Different HR and RR Combination')
     parser.add_argument('--minute', type=int, default=3, help='Length of Working (Unit: min), default=3')
-    parser.add_argument('--hr', type=int, default=64, help='HR to enter')
+    parser.add_argument('--hr', type=int, default=40, help='HR to enter')
     parser.add_argument('--rr', type=int, default=16, help='RR to enter')
     parser.add_argument('--rr_step', type=float, default=0.02, help='Resp Effect')
     parser.add_argument('--max_amp', type=int, default=256, help='Amplitude')
