@@ -233,8 +233,9 @@ def sine_gen_with_rr_v4(min_amp, max_amp, samples, duty_circle, duration, hr, rr
 def chirp_wave(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step):
     wave = []
     wave = np.array(wave)
+    hr = 40
     for i in range(21):
-        wave_f = sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, 10, 40, 16, rr_step)
+        wave_f = sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, 10, hr, 16, rr_step)
         wave = np.concatenate((wave, wave_f))
         hr += 10
     return wave
