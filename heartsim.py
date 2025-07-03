@@ -24,7 +24,8 @@ def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, durat
             wave = pulse_gen_with_rr(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)
         elif waveform == "sine":
             wave = sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)
-           
+        elif waveform == "chirp":
+            wave = chirp_wave(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step)   
         elif waveform == "db":
             wave = db12_gen(min_amp,max_amp, samples, duration, hr)
         elif waveform == "sym":
