@@ -110,3 +110,14 @@ start_time: 1750258615.6582403, duration: 3, hr: 64, rr: 16, waveform: sine, dc:
 start_time: 1750258644.7999718, duration: 3, hr: 64, rr: 16, waveform: sine, dc: 0.5, max_amp: 256 
 start_time: 1750258670.591825, duration: 3, hr: 64, rr: 16, waveform: sine, dc: 0.5, max_amp: 200 
 start_time: 1750258703.146149, duration: 3, hr: 64, rr: 16, waveform: sine, dc: 0.5, max_amp: 160 
+start_time: 1751564767.2336097, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
+start_time: 1751564909.2710593, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
+start_time: 1751564984.7796152, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
+start_time: 1751565273.7473288, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
+start_time: 1751565348.2429535, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
+start_time: 1751565452.7832065, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
+start_time: 1751566275.9148533, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
+start_time: 1751566352.6598518, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
+start_time: 1751566774.082777, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
+start_time: 1751567193.5711415, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
+start_time: 1751567337.3233297, duration: 3, hr: 40, rr: 16, waveform: chirp, dc: 0.5, max_amp: 256 
