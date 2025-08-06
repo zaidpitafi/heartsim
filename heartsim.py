@@ -7,7 +7,7 @@ import board
 import adafruit_mcp4725 as a
 import time
 import paho.mqtt.client as mqtt
-from utils import pulse_gen_with_rr, sine_gen_with_rr_v4, get_mac, write_mqtt, db12_gen, sym4_gen, sine_gen_with_rr_irr_v2, chirp_wave
+from utils import pulse_gen_with_rr, get_mac, write_mqtt, db12_gen, sym4_gen, sine_gen_with_rr_irr_v2, chirp_wave
 
 def main(hr, rr, rr_step, max_amp, min_amp, waveform, duty_circle, minute, duration=60, samples=410):   
     delay_req = 1/(samples) 
