@@ -19,10 +19,8 @@ import pywt
 ************************ Used for Label Upload ************************
 """
 
-
 def get_mac(interface='eth0'):
     return netifaces.ifaddresses(interface)[netifaces.AF_LINK][0]['addr']
-
 
 def pack_beddot_data(mac_addr, timestamp, data_interval, data):
     # First, convert the MAC address into byte sequence
@@ -37,7 +35,6 @@ def pack_beddot_data(mac_addr, timestamp, data_interval, data):
     for item in data:
         packed_data += struct.pack("i", item)
     return packed_data
-
 
 def write_mqtt(hrdata, rrdata, timestamp, fs):
     # mac_addr=get_mac()
@@ -85,7 +82,6 @@ def db12_gen(min_amp,max_amp, samples, duration, hr):
     min_val = min_amp
     max_val = max_amp
 
-
     reps = int(duration*hr/60) 
     wavelet = pywt.Wavelet('db12')
     phi, psi, x = wavelet.wavefun(level=3)
@@ -131,6 +127,20 @@ def mexhat_gen_with_rr(min_amp, max_amp, samples, duration, hr, rr, rr_step):
     wave = abs(wave)
 
     return wave
+
+def chirp_wave(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step):
+    wave = []
+    wave = np.array(wave)
+    hr = 40
+    for i in range(21):
+        wave_f = sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, 10, hr, 16, rr_step)
+        wave = np.concatenate((wave, wave_f))
+        hr += 10
+    return wave
+
+"""
+************************ Sine and Pulse Waveforms ************************
+"""
 
 def apply_amp(wave, max_amp, min_amp):
     return min_amp + ((wave - np.min(wave)) / (np.max(wave) - np.min(wave))) * (max_amp - min_amp)
@@ -184,63 +194,6 @@ def pulse_gen_with_rr(min_val, max_val, samples, duty_circle, duration, hr, rr, 
     return wave
 
 
-def sine_wave_base(samples, duty_cycle, hrv=None):
-    f_hr = 0.5 / duty_cycle
-    t = np.linspace(0, 1, samples, endpoint=False)
-    sine_wave = np.sin(2 * np.pi * f_hr * t)[:int(samples * duty_cycle)]
-    zeros = np.zeros(samples - int(samples * duty_cycle))
-    wave = np.concatenate([sine_wave, zeros])
-    if hrv:
-        hrv_len = int(samples * random.uniform(-1 * hrv, hrv))
-        if hrv_len > 0: 
-            wave = np.concatenate([wave, np.zeros(hrv_len)])
-        elif hrv_len < 0:
-            wave = wave[:hrv_len]
-    return wave
-
-
-def sine_gen_with_rr_v4(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step):
-    min_val = min_amp
-    max_val = max_amp
-
-    # duty_cycle = 0.75
-
-    ## Select base sine wave - with or without Duty Cycle
-    wave = sine_wave_base(samples, duty_circle)
-
-    ### For RR effect uncomment this
-    val = int(np.round(hr/rr))
-    reps = int(np.round(rr/60*duration))
-    if hr <140: val = val-1
-    scaling_factors = generate_increasing_amplitude_wave_array(val, rr_step)
-    rsa = np.tile(wave, len(scaling_factors)) * np.repeat(scaling_factors, len(wave))
-    wave_f = np.tile(rsa,reps)
-
-    ### For RR effect comment this
-    # reps = int(hr)
-    # wave_f = np.tile(wave, reps)
-
-    ## Resample to intended duration
-    new_length = duration*samples
-    wave = np.interp(np.linspace(0, len(wave_f)-1, new_length), np.arange(len(wave_f)), wave_f)
-    
-    ## Select Normalization
-    wave = min_val + ((wave - np.min(wave)) / (np.max(wave) - np.min(wave))) * (max_val - min_val)
-    
-    wave = abs(wave)
-    return wave
-
-def chirp_wave(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step):
-    wave = []
-    wave = np.array(wave)
-    hr = 40
-    for i in range(21):
-        wave_f = sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, 10, hr, 16, rr_step)
-        wave = np.concatenate((wave, wave_f))
-        hr += 10
-    return wave
-
-
 def sine_gen_with_rr_irr(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step, hrv=10):
     hr_num = int(duration * hr / 60) + 1
     rr_num = int(duration * rr / 60) + 1
@@ -259,6 +212,23 @@ def sine_gen_with_rr_irr(min_amp, max_amp, samples, duty_circle, duration, hr, r
     
     wave = apply_amp(wave, max_amp, min_amp)
     return wave
+
+
+def sine_wave_base(samples, duty_cycle, hrv=None):
+    f_hr = 0.5 / duty_cycle
+    t = np.linspace(0, 1, samples, endpoint=False)
+    sine_wave = np.sin(2 * np.pi * f_hr * t)[:int(samples * duty_cycle)]
+    zeros = np.zeros(samples - int(samples * duty_cycle))
+    wave = np.concatenate([sine_wave, zeros])
+    if hrv:
+        hrv_len = int(samples * random.uniform(-1 * hrv, hrv))
+        if hrv_len > 0: 
+            wave = np.concatenate([wave, np.zeros(hrv_len)])
+        elif hrv_len < 0:
+            wave = wave[:hrv_len]
+    return wave
+
+
 
 
 def sine_gen_with_rr_irr_v2(min_amp, max_amp, samples, duty_circle, duration, hr, rr, rr_step):
